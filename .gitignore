@@ -1,0 +1,19 @@
+# Fichiers audio générés
+*.wav
+
+# Archives Sketchfab et doublons extraits (on conserve uniquement le STL de base)
+*.zip
+paleo_acoustic_data/Baby Parasaurolophus Skeleton_*/
+
+# Python & Jupyter
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Système
+.DS_Store
+Thumbs.db
+
