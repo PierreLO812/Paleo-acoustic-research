@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://paleo-acoustic-research.local/schemas/soft_tissue.schema.json",
+  "title": "Paleo-Acoustic Soft-Tissue Hypotheses v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "taxon_slug", "notes", "parameters"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "taxon_slug": { "type": "string", "minLength": 1 },
+    "notes": { "type": "string" },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mucosa_thickness_mm",
+        "wall_mass_per_area",
+        "wall_stiffness_per_area",
+        "wall_resistance_per_area",
+        "extra_damping_factor",
+        "f0_prior_hz",
+        "air_temperature_c",
+        "lumen_min_area_fraction"
+      ],
+      "properties": {
+        "mucosa_thickness_mm": { "$ref": "#/$defs/parameter" },
+        "wall_mass_per_area": { "$ref": "#/$defs/parameter" },
+        "wall_stiffness_per_area": { "$ref": "#/$defs/parameter" },
+        "wall_resistance_per_area": { "$ref": "#/$defs/parameter" },
+        "extra_damping_factor": { "$ref": "#/$defs/parameter" },
+        "f0_prior_hz": { "$ref": "#/$defs/parameter" },
+        "air_temperature_c": { "$ref": "#/$defs/parameter" },
+        "lumen_min_area_fraction": { "$ref": "#/$defs/parameter" }
+      }
+    }
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "range",
+        "unit",
+        "source",
+        "source_locator",
+        "kind",
+        "confidence",
+        "notes"
+      ],
+      "properties": {
+        "value": { "type": ["number", "null"] },
+        "range": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "type": "number" }
+        },
+        "unit": { "type": "string", "minLength": 1 },
+        "scale": { "type": "string", "enum": ["linear", "log"] },
+        "source": { "type": "string", "minLength": 1 },
+        "source_locator": { "type": ["string", "null"] },
+        "model_source": { "type": ["string", "null"] },
+        "kind": {
+          "type": "string",
+          "enum": ["cited", "analog_human", "analog_extant", "epb_bracket", "hypothesis"]
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low", "unknown"]
+        },
+        "verified_by_human": { "type": "boolean" },
+        "used_in": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "discrete_values": {
+          "type": ["array", "null"],
+          "items": { "type": "number" }
+        },
+        "notes": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

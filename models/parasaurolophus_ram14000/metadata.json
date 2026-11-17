@@ -16,6 +16,7 @@
   "soft_tissue_assumptions": {
     "lining_present": true,
     "lining_thickness_mm": 2.0,
+    "superseded_by": "soft_tissue_hypotheses.json",
     "glottal_source": "two_mass_stochastic",
     "boundary_condition": "open_nostril_approx_Z0",
     "temperature_c": 20.0,
