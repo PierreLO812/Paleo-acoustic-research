@@ -470,15 +470,66 @@ def compute_shaping_gain_db(
     bandwidth_hz: float,
     *,
     nperseg: int = 16384,
+    min_half_width_hz: float | None = None,
 ) -> tuple[float, float, float]:
-    """Return (shaping_gain_db, filtered_band_frac, source_band_frac) for [f_center - bw/2, f_center + bw/2]."""
-    half = max(25.0, 0.5 * float(bandwidth_hz))
+    """Return (shaping_gain_db, filtered_band_frac, source_band_frac) for [f_center - half, f_center + half]."""
+    n_avail = max(1, min(len(source), len(filtered)))
+    nseg = min(int(nperseg), n_avail)
+    min_hw = (2.0 * float(fs) / max(nseg, 1)) if min_half_width_hz is None else float(min_half_width_hz)
+    half = max(min_hw, 0.5 * float(bandwidth_hz))
     f_lo = max(0.0, float(f_center_hz) - half)
     f_hi = float(f_center_hz) + half
     e_flt = band_fraction_for_window(filtered, fs, f_lo, f_hi, nperseg=nperseg)
     e_src = band_fraction_for_window(source, fs, f_lo, f_hi, nperseg=nperseg)
     gain_db = 10.0 * np.log10(max(e_flt, 1e-12) / max(e_src, 1e-12))
     return float(gain_db), float(e_flt), float(e_src)
+
+
+def compute_shaping_metrics(
+    source: np.ndarray,
+    filtered: np.ndarray,
+    fs: int,
+    f1_hz: float,
+    b1_hz: float,
+    *,
+    nperseg: int = 16384,
+) -> dict:
+    """Compute both F1 +/- B1/2 (min 2 Welch bins) and legacy F1 +/- 60 Hz shaping metrics."""
+    n_avail = max(1, min(len(source), len(filtered)))
+    nseg = min(int(nperseg), n_avail)
+    min_hw = 2.0 * float(fs) / max(nseg, 1)
+
+    half_b3db = max(min_hw, 0.5 * float(b1_hz))
+    lo_b3db = max(0.0, float(f1_hz) - half_b3db)
+    hi_b3db = float(f1_hz) + half_b3db
+    g_b3db, ef_b3db, es_b3db = compute_shaping_gain_db(
+        source, filtered, fs, f1_hz, b1_hz, nperseg=nperseg, min_half_width_hz=min_hw
+    )
+
+    lo_pm60 = max(0.0, float(f1_hz) - 60.0)
+    hi_pm60 = float(f1_hz) + 60.0
+    g_pm60, ef_pm60, es_pm60 = compute_shaping_gain_db(
+        source, filtered, fs, f1_hz, 120.0, nperseg=nperseg, min_half_width_hz=60.0
+    )
+
+    return {
+        "b3db": {
+            "shaping_gain_db_F1_b3db": round(g_b3db, 3),
+            "band_hz": [round(lo_b3db, 3), round(hi_b3db, 3)],
+            "f1_band_energy_fraction_measured_b3db": round(ef_b3db, 6),
+            "source_band_energy_fraction_measured_b3db": round(es_b3db, 6),
+            "min_half_width_hz": round(min_hw, 4),
+        },
+        "pm60": {
+            "shaping_gain_db_F1_pm60": round(g_pm60, 3),
+            "band_hz": [round(lo_pm60, 3), round(hi_pm60, 3)],
+            "f1_band_energy_fraction_measured_pm60": round(ef_pm60, 6),
+            "source_band_energy_fraction_measured_pm60": round(es_pm60, 6),
+        },
+        "shaping_gain_db_F1_b3db": round(g_b3db, 3),
+        "shaping_gain_db_F1_pm60": round(g_pm60, 3),
+        "f1_band_energy_fraction_measured_pm60": round(ef_pm60, 6),
+    }
 
 
 def measure_source_spectral_tilt(
@@ -565,7 +616,7 @@ def plot_transfer_function(tf_data: dict, out_png: Path, *, fmax_plot: float = 3
     ax2.legend(loc="lower right", fontsize=8)
 
     fig.tight_layout()
-    fig.savefig(out_png, dpi=140)
+    fig.savefig(out_png, dpi=96)
     plt.close(fig)
 
 
@@ -604,14 +655,15 @@ def measure_run_dir(
     shaping_measured = None
     if tf_data["peaks"]:
         p1 = tf_data["peaks"][0]
-        sg_db, e_f1, e_s1 = compute_shaping_gain_db(
-            source, filtered, sr, p1["f_hz"], max(p1["bw_3db_hz"], 120.0)
-        )
+        sh_all = compute_shaping_metrics(source, filtered, sr, p1["f_hz"], p1["bw_3db_hz"])
         shaping_measured = {
             "f1_hz": p1["f_hz"],
-            "shaping_gain_db": round(sg_db, 3),
-            "filtered_band_fraction": round(e_f1, 6),
-            "source_band_fraction": round(e_s1, 6),
+            "shaping_gain_db": sh_all["shaping_gain_db_F1_pm60"],
+            "filtered_band_fraction": sh_all["f1_band_energy_fraction_measured_pm60"],
+            "source_band_fraction": sh_all["pm60"]["source_band_energy_fraction_measured_pm60"],
+            "shaping_gain_db_F1_b3db": sh_all["shaping_gain_db_F1_b3db"],
+            "b3db": sh_all["b3db"],
+            "pm60": sh_all["pm60"],
         }
 
     measured = {
