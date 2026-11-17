@@ -1,0 +1,806 @@
+{
+  "schema_version": "1.0",
+  "taxon_slug": "parasaurolophus_ram14000",
+  "geometry_status": "BONE_DERIVED_EXPLORATORY",
+  "state_effect": "none (sensitivity scenarios are exploratory and cannot upgrade state)",
+  "soft_tissue_file": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\models\\parasaurolophus_ram14000\\soft_tissue_hypotheses.json",
+  "epb": {
+    "status": "not_provided",
+    "path": null,
+    "concept_reference": "Witmer, L. M. (1995). The Extant Phylogenetic Bracket and the importance of reconstructing soft tissues in fossils. In Thomason, J. J. (ed.), Functional Morphology in Vertebrate Paleontology, pp. 19-33. Cambridge University Press.",
+    "applied_measures": []
+  },
+  "seed": 0,
+  "n_samples": 64,
+  "n_valid": 42,
+  "n_invalid": 22,
+  "invalid_reasons": {
+    "occluded lumen at section 0 (s=0.00 mm)": 22
+  },
+  "bone_only_baseline": {
+    "sample_id": -2,
+    "mucosa_thickness_mm": 0.0,
+    "wall_mass_per_area": 0.0,
+    "wall_stiffness_per_area": 0.0,
+    "wall_resistance_per_area": 0.0,
+    "extra_damping_factor": 1.0,
+    "f0_prior_hz": 60.0,
+    "air_temperature_c": 20.0,
+    "valid": true,
+    "invalid_reason": "",
+    "F1_hz": 341.691,
+    "F2_hz": 1008.243,
+    "F3_hz": 1636.556,
+    "Q1": 45.045,
+    "Q2": 50.3,
+    "Q3": 54.434,
+    "B1_hz": 7.586,
+    "B2_hz": 20.044,
+    "B3_hz": 30.065,
+    "mean_bw_hz": 19.2317,
+    "wall_resonance_closed_hz": null,
+    "shaping_gain_db_F1_b3db_predicted": 29.795
+  },
+  "nominal_soft_tissue": {
+    "sample_id": -1,
+    "mucosa_thickness_mm": 2.25,
+    "wall_mass_per_area": 10.0,
+    "wall_stiffness_per_area": 1000000.0,
+    "wall_resistance_per_area": 3162.2776601683795,
+    "extra_damping_factor": 2.0,
+    "f0_prior_hz": 60.0,
+    "air_temperature_c": 28.5,
+    "valid": true,
+    "invalid_reason": "",
+    "F1_hz": 483.241,
+    "F2_hz": 1048.223,
+    "F3_hz": 1716.756,
+    "Q1": 11.302,
+    "Q2": 24.598,
+    "Q3": 30.933,
+    "B1_hz": 42.755,
+    "B2_hz": 42.614,
+    "B3_hz": 55.5,
+    "mean_bw_hz": 46.9563,
+    "wall_resonance_closed_hz": 325.499,
+    "shaping_gain_db_F1_b3db_predicted": 20.964
+  },
+  "intervals_p05_median_p95": {
+    "F1_hz": {
+      "n": 42,
+      "median": 467.2995,
+      "p05": 377.5229,
+      "p95": 1103.551,
+      "min": 75.899,
+      "max": 1209.457
+    },
+    "F2_hz": {
+      "n": 42,
+      "median": 1049.506,
+      "p05": 1001.4303,
+      "p95": 1750.4573,
+      "min": 413.871,
+      "max": 1849.313
+    },
+    "F3_hz": {
+      "n": 42,
+      "median": 1713.0595,
+      "p05": 1648.0001,
+      "p95": 2418.9438,
+      "min": 1002.007,
+      "max": 2542.931
+    },
+    "Q1": {
+      "n": 42,
+      "median": 13.392,
+      "p05": 2.4927,
+      "p95": 27.9563,
+      "min": 1.3,
+      "max": 35.655
+    },
+    "Q2": {
+      "n": 42,
+      "median": 23.9905,
+      "p05": 13.2736,
+      "p95": 43.7549,
+      "min": 11.377,
+      "max": 47.078
+    },
+    "Q3": {
+      "n": 42,
+      "median": 29.9545,
+      "p05": 21.9464,
+      "p95": 52.0968,
+      "min": 17.196,
+      "max": 55.3
+    },
+    "B1_hz": {
+      "n": 42,
+      "median": 38.236,
+      "p05": 11.9071,
+      "p95": 222.5859,
+      "min": 5.219,
+      "max": 326.556
+    },
+    "B2_hz": {
+      "n": 42,
+      "median": 42.216,
+      "p05": 23.1733,
+      "p95": 100.7878,
+      "min": 21.531,
+      "max": 156.466
+    },
+    "B3_hz": {
+      "n": 42,
+      "median": 54.6665,
+      "p05": 32.3537,
+      "p95": 96.5671,
+      "min": 31.013,
+      "max": 142.428
+    },
+    "mean_bw_hz": {
+      "n": 42,
+      "median": 45.6577,
+      "p05": 22.6598,
+      "p95": 153.156,
+      "min": 21.0117,
+      "max": 173.446
+    },
+    "wall_resonance_closed_hz": {
+      "n": 42,
+      "median": 316.7025,
+      "p05": 155.15,
+      "p95": 631.1487,
+      "min": 124.92,
+      "max": 687.661
+    },
+    "shaping_gain_db_F1_b3db_predicted": {
+      "n": 42,
+      "median": 19.336,
+      "p05": 1.9577,
+      "p95": 27.6902,
+      "min": 1.354,
+      "max": 28.8
+    }
+  },
+  "oat_sensitivity": [
+    {
+      "parameter": "mucosa_thickness_mm",
+      "lo_value": 0.5,
+      "hi_value": 2.7908,
+      "hi_clamped_before_occlusion": 2.7908,
+      "lo_valid": true,
+      "hi_valid": true,
+      "F1_hz_lo_delta": -41.514,
+      "F1_hz_hi_delta": 19.886,
+      "delta_F1_hz": 61.4,
+      "Q1_lo_delta": 2.028,
+      "Q1_hi_delta": -0.787,
+      "delta_Q1": 2.815,
+      "shaping_gain_db_F1_b3db_predicted_lo_delta": -0.32,
+      "shaping_gain_db_F1_b3db_predicted_hi_delta": -1.991,
+      "delta_gain_db": 1.991
+    },
+    {
+      "parameter": "wall_mass_per_area",
+      "lo_value": 2.0,
+      "hi_value": 50.0,
+      "hi_clamped_before_occlusion": null,
+      "lo_valid": true,
+      "hi_valid": true,
+      "F1_hz_lo_delta": 749.927,
+      "F1_hz_hi_delta": -105.508,
+      "delta_F1_hz": 855.435,
+      "Q1_lo_delta": -1.694,
+      "Q1_hi_delta": 6.853,
+      "delta_Q1": 8.547,
+      "shaping_gain_db_F1_b3db_predicted_lo_delta": -12.875,
+      "shaping_gain_db_F1_b3db_predicted_hi_delta": 3.535,
+      "delta_gain_db": 16.41
+    },
+    {
+      "parameter": "wall_stiffness_per_area",
+      "lo_value": 100000.0,
+      "hi_value": 10000000.0,
+      "hi_clamped_before_occlusion": null,
+      "lo_valid": true,
+      "hi_valid": true,
+      "F1_hz_lo_delta": -1.164,
+      "F1_hz_hi_delta": 12.157,
+      "delta_F1_hz": 13.321,
+      "Q1_lo_delta": 0.015,
+      "Q1_hi_delta": -0.122,
+      "delta_Q1": 0.137,
+      "shaping_gain_db_F1_b3db_predicted_lo_delta": 0.037,
+      "shaping_gain_db_F1_b3db_predicted_hi_delta": -9.501,
+      "delta_gain_db": 9.538
+    },
+    {
+      "parameter": "wall_resistance_per_area",
+      "lo_value": 500.0,
+      "hi_value": 20000.0,
+      "hi_clamped_before_occlusion": null,
+      "lo_valid": true,
+      "hi_valid": true,
+      "F1_hz_lo_delta": 0.157,
+      "F1_hz_hi_delta": -27.746,
+      "delta_F1_hz": 27.903,
+      "Q1_lo_delta": 10.666,
+      "Q1_hi_delta": -8.566,
+      "delta_Q1": 19.232,
+      "shaping_gain_db_F1_b3db_predicted_lo_delta": 5.567,
+      "shaping_gain_db_F1_b3db_predicted_hi_delta": -13.813,
+      "delta_gain_db": 19.38
+    },
+    {
+      "parameter": "extra_damping_factor",
+      "lo_value": 1.0,
+      "hi_value": 3.0,
+      "hi_clamped_before_occlusion": null,
+      "lo_valid": true,
+      "hi_valid": true,
+      "F1_hz_lo_delta": 4.151,
+      "F1_hz_hi_delta": -4.209,
+      "delta_F1_hz": 8.36,
+      "Q1_lo_delta": 2.953,
+      "Q1_hi_delta": -1.938,
+      "delta_Q1": 4.891,
+      "shaping_gain_db_F1_b3db_predicted_lo_delta": 0.7,
+      "shaping_gain_db_F1_b3db_predicted_hi_delta": -0.927,
+      "delta_gain_db": 1.627
+    },
+    {
+      "parameter": "f0_prior_hz",
+      "lo_value": 30.0,
+      "hi_value": 120.0,
+      "hi_clamped_before_occlusion": null,
+      "lo_valid": true,
+      "hi_valid": true,
+      "F1_hz_lo_delta": 0.0,
+      "F1_hz_hi_delta": 0.0,
+      "delta_F1_hz": 0.0,
+      "Q1_lo_delta": 0.0,
+      "Q1_hi_delta": 0.0,
+      "delta_Q1": 0.0,
+      "shaping_gain_db_F1_b3db_predicted_lo_delta": -5.728,
+      "shaping_gain_db_F1_b3db_predicted_hi_delta": -4.842,
+      "delta_gain_db": 5.728
+    },
+    {
+      "parameter": "air_temperature_c",
+      "lo_value": 20.0,
+      "hi_value": 37.0,
+      "hi_clamped_before_occlusion": null,
+      "lo_valid": true,
+      "hi_valid": true,
+      "F1_hz_lo_delta": -3.599,
+      "F1_hz_hi_delta": 3.317,
+      "delta_F1_hz": 6.916,
+      "Q1_lo_delta": 0.005,
+      "Q1_hi_delta": 0.02,
+      "delta_Q1": 0.02,
+      "shaping_gain_db_F1_b3db_predicted_lo_delta": -0.08,
+      "shaping_gain_db_F1_b3db_predicted_hi_delta": -0.209,
+      "delta_gain_db": 0.209
+    }
+  ],
+  "importance": {
+    "spearman": {
+      "F1_hz": {
+        "mucosa_thickness_mm": {
+          "rho": 0.0916,
+          "p_value": 0.563787
+        },
+        "wall_mass_per_area": {
+          "rho": -0.9459,
+          "p_value": 0.0
+        },
+        "wall_stiffness_per_area": {
+          "rho": -0.1043,
+          "p_value": 0.511018
+        },
+        "wall_resistance_per_area": {
+          "rho": -0.1367,
+          "p_value": 0.388007
+        },
+        "extra_damping_factor": {
+          "rho": 0.0275,
+          "p_value": 0.862901
+        },
+        "f0_prior_hz": {
+          "rho": 0.1419,
+          "p_value": 0.370085
+        },
+        "air_temperature_c": {
+          "rho": 0.0927,
+          "p_value": 0.559099
+        }
+      },
+      "Q1": {
+        "mucosa_thickness_mm": {
+          "rho": 0.049,
+          "p_value": 0.757849
+        },
+        "wall_mass_per_area": {
+          "rho": 0.5923,
+          "p_value": 3.6e-05
+        },
+        "wall_stiffness_per_area": {
+          "rho": -0.078,
+          "p_value": 0.623287
+        },
+        "wall_resistance_per_area": {
+          "rho": -0.5346,
+          "p_value": 0.000266
+        },
+        "extra_damping_factor": {
+          "rho": -0.4114,
+          "p_value": 0.006796
+        },
+        "f0_prior_hz": {
+          "rho": -0.0968,
+          "p_value": 0.541836
+        },
+        "air_temperature_c": {
+          "rho": -0.1598,
+          "p_value": 0.311957
+        }
+      },
+      "shaping_gain_db_F1_b3db_predicted": {
+        "mucosa_thickness_mm": {
+          "rho": 0.0385,
+          "p_value": 0.80877
+        },
+        "wall_mass_per_area": {
+          "rho": 0.6205,
+          "p_value": 1.2e-05
+        },
+        "wall_stiffness_per_area": {
+          "rho": -0.2767,
+          "p_value": 0.076131
+        },
+        "wall_resistance_per_area": {
+          "rho": -0.3544,
+          "p_value": 0.021307
+        },
+        "extra_damping_factor": {
+          "rho": -0.3764,
+          "p_value": 0.014016
+        },
+        "f0_prior_hz": {
+          "rho": -0.1531,
+          "p_value": 0.33314
+        },
+        "air_temperature_c": {
+          "rho": -0.0691,
+          "p_value": 0.663834
+        }
+      }
+    },
+    "prcc": {
+      "F1_hz": {
+        "mucosa_thickness_mm": 0.5763,
+        "wall_mass_per_area": -0.9629,
+        "wall_stiffness_per_area": -0.1208,
+        "wall_resistance_per_area": 0.0662,
+        "extra_damping_factor": -0.1441,
+        "f0_prior_hz": -0.1442,
+        "air_temperature_c": 0.0589
+      },
+      "Q1": {
+        "mucosa_thickness_mm": -0.0917,
+        "wall_mass_per_area": 0.8545,
+        "wall_stiffness_per_area": -0.1065,
+        "wall_resistance_per_area": -0.8289,
+        "extra_damping_factor": -0.6458,
+        "f0_prior_hz": -0.144,
+        "air_temperature_c": -0.1758
+      },
+      "shaping_gain_db_F1_b3db_predicted": {
+        "mucosa_thickness_mm": -0.112,
+        "wall_mass_per_area": 0.7929,
+        "wall_stiffness_per_area": -0.4775,
+        "wall_resistance_per_area": -0.6201,
+        "extra_damping_factor": -0.486,
+        "f0_prior_hz": -0.1221,
+        "air_temperature_c": 0.0206
+      }
+    },
+    "rankings": {
+      "F1_hz": [
+        {
+          "parameter": "wall_mass_per_area",
+          "abs_spearman_rho": 0.9459,
+          "spearman_rho": -0.9459,
+          "prcc": -0.9629,
+          "oat_span": 855.435
+        },
+        {
+          "parameter": "f0_prior_hz",
+          "abs_spearman_rho": 0.1419,
+          "spearman_rho": 0.1419,
+          "prcc": -0.1442,
+          "oat_span": 0.0
+        },
+        {
+          "parameter": "wall_resistance_per_area",
+          "abs_spearman_rho": 0.1367,
+          "spearman_rho": -0.1367,
+          "prcc": 0.0662,
+          "oat_span": 27.903
+        },
+        {
+          "parameter": "wall_stiffness_per_area",
+          "abs_spearman_rho": 0.1043,
+          "spearman_rho": -0.1043,
+          "prcc": -0.1208,
+          "oat_span": 13.321
+        },
+        {
+          "parameter": "air_temperature_c",
+          "abs_spearman_rho": 0.0927,
+          "spearman_rho": 0.0927,
+          "prcc": 0.0589,
+          "oat_span": 6.916
+        },
+        {
+          "parameter": "mucosa_thickness_mm",
+          "abs_spearman_rho": 0.0916,
+          "spearman_rho": 0.0916,
+          "prcc": 0.5763,
+          "oat_span": 61.4
+        },
+        {
+          "parameter": "extra_damping_factor",
+          "abs_spearman_rho": 0.0275,
+          "spearman_rho": 0.0275,
+          "prcc": -0.1441,
+          "oat_span": 8.36
+        }
+      ],
+      "Q1": [
+        {
+          "parameter": "wall_mass_per_area",
+          "abs_spearman_rho": 0.5923,
+          "spearman_rho": 0.5923,
+          "prcc": 0.8545,
+          "oat_span": 8.547
+        },
+        {
+          "parameter": "wall_resistance_per_area",
+          "abs_spearman_rho": 0.5346,
+          "spearman_rho": -0.5346,
+          "prcc": -0.8289,
+          "oat_span": 19.232
+        },
+        {
+          "parameter": "extra_damping_factor",
+          "abs_spearman_rho": 0.4114,
+          "spearman_rho": -0.4114,
+          "prcc": -0.6458,
+          "oat_span": 4.891
+        },
+        {
+          "parameter": "air_temperature_c",
+          "abs_spearman_rho": 0.1598,
+          "spearman_rho": -0.1598,
+          "prcc": -0.1758,
+          "oat_span": 0.02
+        },
+        {
+          "parameter": "f0_prior_hz",
+          "abs_spearman_rho": 0.0968,
+          "spearman_rho": -0.0968,
+          "prcc": -0.144,
+          "oat_span": 0.0
+        },
+        {
+          "parameter": "wall_stiffness_per_area",
+          "abs_spearman_rho": 0.078,
+          "spearman_rho": -0.078,
+          "prcc": -0.1065,
+          "oat_span": 0.137
+        },
+        {
+          "parameter": "mucosa_thickness_mm",
+          "abs_spearman_rho": 0.049,
+          "spearman_rho": 0.049,
+          "prcc": -0.0917,
+          "oat_span": 2.815
+        }
+      ],
+      "shaping_gain_db_F1_b3db_predicted": [
+        {
+          "parameter": "wall_mass_per_area",
+          "abs_spearman_rho": 0.6205,
+          "spearman_rho": 0.6205,
+          "prcc": 0.7929,
+          "oat_span": 16.41
+        },
+        {
+          "parameter": "extra_damping_factor",
+          "abs_spearman_rho": 0.3764,
+          "spearman_rho": -0.3764,
+          "prcc": -0.486,
+          "oat_span": 1.627
+        },
+        {
+          "parameter": "wall_resistance_per_area",
+          "abs_spearman_rho": 0.3544,
+          "spearman_rho": -0.3544,
+          "prcc": -0.6201,
+          "oat_span": 19.38
+        },
+        {
+          "parameter": "wall_stiffness_per_area",
+          "abs_spearman_rho": 0.2767,
+          "spearman_rho": -0.2767,
+          "prcc": -0.4775,
+          "oat_span": 9.538
+        },
+        {
+          "parameter": "f0_prior_hz",
+          "abs_spearman_rho": 0.1531,
+          "spearman_rho": -0.1531,
+          "prcc": -0.1221,
+          "oat_span": 5.728
+        },
+        {
+          "parameter": "air_temperature_c",
+          "abs_spearman_rho": 0.0691,
+          "spearman_rho": -0.0691,
+          "prcc": 0.0206,
+          "oat_span": 0.209
+        },
+        {
+          "parameter": "mucosa_thickness_mm",
+          "abs_spearman_rho": 0.0385,
+          "spearman_rho": 0.0385,
+          "prcc": -0.112,
+          "oat_span": 1.991
+        }
+      ]
+    }
+  },
+  "scenarios": [
+    {
+      "kind": "hypothesis_scenario",
+      "scenario": "min",
+      "wav_file": "scenario_damping_min.wav",
+      "sample_id": 4,
+      "parameters": {
+        "mucosa_thickness_mm": 0.521034,
+        "wall_mass_per_area": 46.638717,
+        "wall_stiffness_per_area": 4532493.495362,
+        "wall_resistance_per_area": 3986.653429,
+        "extra_damping_factor": 1.134827,
+        "f0_prior_hz": 63.132621,
+        "air_temperature_c": 20.0
+      },
+      "predicted_tmm_peaks": [
+        {
+          "f_hz": 365.975,
+          "bw_3db_hz": 10.264,
+          "q": 35.655,
+          "mag_db": 32.191
+        },
+        {
+          "f_hz": 1013.629,
+          "bw_3db_hz": 21.531,
+          "q": 47.078,
+          "mag_db": 27.267
+        },
+        {
+          "f_hz": 1646.588,
+          "bw_3db_hz": 31.24,
+          "q": 52.708,
+          "mag_db": 24.962
+        }
+      ],
+      "measured_f0_hz": 63.1444,
+      "measured_hf_peaks": [
+        {
+          "f_hz": 365.909,
+          "bw_3db_hz": 12.776,
+          "q": 28.64,
+          "coherence": 0.9596,
+          "gain_db": 25.605
+        },
+        {
+          "f_hz": 1021.786,
+          "bw_3db_hz": 23.128,
+          "q": 44.179,
+          "coherence": 0.983,
+          "gain_db": 21.593
+        },
+        {
+          "f_hz": 1647.382,
+          "bw_3db_hz": 34.344,
+          "q": 47.967,
+          "coherence": 0.9947,
+          "gain_db": 19.228
+        },
+        {
+          "f_hz": 2339.621,
+          "bw_3db_hz": 54.798,
+          "q": 42.695,
+          "coherence": 0.9976,
+          "gain_db": 18.111
+        }
+      ],
+      "band_energy_fractions_filtered": {
+        "0-100": 0.1669893139923708,
+        "100-300": 0.14409925081934769,
+        "300-420": 0.5445161457460777,
+        "420-800": 0.022500565941577066,
+        "800-1500": 0.08093089088216356,
+        "1500-3000": 0.03016702402344868,
+        "3000-22050": 0.010796808595014369
+      },
+      "audio_peak_dbfs": -1.0,
+      "clipping_detected": false
+    },
+    {
+      "kind": "hypothesis_scenario",
+      "scenario": "median",
+      "wav_file": "scenario_damping_median.wav",
+      "sample_id": 13,
+      "parameters": {
+        "mucosa_thickness_mm": 0.77623,
+        "wall_mass_per_area": 9.771277,
+        "wall_stiffness_per_area": 1356972.272276,
+        "wall_resistance_per_area": 2900.789632,
+        "extra_damping_factor": 2.795959,
+        "f0_prior_hz": 64.32621,
+        "air_temperature_c": 20.0
+      },
+      "predicted_tmm_peaks": [
+        {
+          "f_hz": 443.182,
+          "bw_3db_hz": 37.687,
+          "q": 11.76,
+          "mag_db": 19.06
+        },
+        {
+          "f_hz": 1034.109,
+          "bw_3db_hz": 42.597,
+          "q": 24.277,
+          "mag_db": 20.967
+        },
+        {
+          "f_hz": 1658.08,
+          "bw_3db_hz": 56.802,
+          "q": 29.19,
+          "mag_db": 19.559
+        }
+      ],
+      "measured_f0_hz": 64.3023,
+      "measured_hf_peaks": [
+        {
+          "f_hz": 448.518,
+          "bw_3db_hz": 37.922,
+          "q": 11.827,
+          "coherence": 0.9992,
+          "gain_db": 17.615
+        },
+        {
+          "f_hz": 1044.014,
+          "bw_3db_hz": 44.549,
+          "q": 23.435,
+          "coherence": 0.9946,
+          "gain_db": 19.564
+        },
+        {
+          "f_hz": 1663.933,
+          "bw_3db_hz": 59.261,
+          "q": 28.078,
+          "coherence": 0.997,
+          "gain_db": 18.195
+        },
+        {
+          "f_hz": 2355.606,
+          "bw_3db_hz": 88.324,
+          "q": 26.67,
+          "coherence": 0.9988,
+          "gain_db": 18.161
+        }
+      ],
+      "band_energy_fractions_filtered": {
+        "0-100": 0.308018680567523,
+        "100-300": 0.0944930569027814,
+        "300-420": 0.03845219018421176,
+        "420-800": 0.4303272591191828,
+        "800-1500": 0.06476001380770276,
+        "1500-3000": 0.04525791016655527,
+        "3000-22050": 0.018690889252043357
+      },
+      "audio_peak_dbfs": -1.0,
+      "clipping_detected": false
+    },
+    {
+      "kind": "hypothesis_scenario",
+      "scenario": "max",
+      "wav_file": "scenario_damping_max.wav",
+      "sample_id": 45,
+      "parameters": {
+        "mucosa_thickness_mm": 2.428042,
+        "wall_mass_per_area": 2.724723,
+        "wall_stiffness_per_area": 2347785.332154,
+        "wall_resistance_per_area": 9078.085374,
+        "extra_damping_factor": 2.974341,
+        "f0_prior_hz": 96.667462,
+        "air_temperature_c": 20.0
+      },
+      "predicted_tmm_peaks": [
+        {
+          "f_hz": 1140.797,
+          "bw_3db_hz": 221.444,
+          "q": 5.152,
+          "mag_db": 5.036
+        },
+        {
+          "f_hz": 1780.114,
+          "bw_3db_hz": 156.466,
+          "q": 11.377,
+          "mag_db": 8.683
+        },
+        {
+          "f_hz": 2449.251,
+          "bw_3db_hz": 142.428,
+          "q": 17.196,
+          "mag_db": 12.178
+        }
+      ],
+      "measured_f0_hz": 95.0442,
+      "measured_hf_peaks": [
+        {
+          "f_hz": 1158.465,
+          "bw_3db_hz": 223.661,
+          "q": 5.18,
+          "coherence": 0.9999,
+          "gain_db": 4.293
+        },
+        {
+          "f_hz": 1797.292,
+          "bw_3db_hz": 164.614,
+          "q": 10.918,
+          "coherence": 0.9996,
+          "gain_db": 7.931
+        },
+        {
+          "f_hz": 2465.724,
+          "bw_3db_hz": 145.932,
+          "q": 16.896,
+          "coherence": 0.9996,
+          "gain_db": 11.505
+        },
+        {
+          "f_hz": 3067.629,
+          "bw_3db_hz": 209.33,
+          "q": 14.655,
+          "coherence": 0.9997,
+          "gain_db": 12.262
+        }
+      ],
+      "band_energy_fractions_filtered": {
+        "0-100": 0.8868811009278443,
+        "100-300": 0.057209440969630744,
+        "300-420": 0.007005988291373016,
+        "420-800": 0.00469855518258771,
+        "800-1500": 0.0033327087470045474,
+        "1500-3000": 0.011664418402055501,
+        "3000-22050": 0.029207787479504067
+      },
+      "audio_peak_dbfs": -1.0,
+      "clipping_detected": false
+    }
+  ],
+  "warnings": [],
+  "artifacts": {
+    "samples_csv": "samples.csv",
+    "tornado_png": "tornado.png",
+    "spaghetti_png": "spaghetti_H.png",
+    "formant_distributions_png": "formant_distributions.png"
+  },
+  "runtime_log": "sensitivity_log.txt"
+}

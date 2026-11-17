@@ -1,10 +1,12 @@
 # Fichiers audio générés (racine / legacy)
 /*.wav
 
-# Pipeline outputs (regenerable, except one tracked example run)
+# Pipeline outputs (regenerable, except tracked example runs)
 output/*
 !output/parasaurolophus_ram14000_20261117T104254Z_19c2be/
 !output/parasaurolophus_ram14000_20261117T104254Z_19c2be/**
+!output/parasaurolophus_ram14000_20261117T223414Z_2b13b0/
+!output/parasaurolophus_ram14000_20261117T223414Z_2b13b0/**
 pipeline/.runs/
 
 # Archives Sketchfab et doublons extraits (on conserve uniquement le STL de base)

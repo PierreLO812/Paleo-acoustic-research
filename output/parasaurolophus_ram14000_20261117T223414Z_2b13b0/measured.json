@@ -1,0 +1,149 @@
+{
+  "run_id": "parasaurolophus_ram14000_20261117T223414Z_2b13b0",
+  "sample_rate": 44100,
+  "f0": {
+    "measured_hz": 60.0791,
+    "measured_std_hz": 0.4951,
+    "method": "yin",
+    "voiced_frames": 158
+  },
+  "f0_filtered": {
+    "measured_hz": 60.0009,
+    "measured_std_hz": 17.232,
+    "method": "yin",
+    "voiced_frames": 152
+  },
+  "formants_measured": {
+    "transfer_function": [
+      {
+        "f_hz": 485.68,
+        "bw_3db_hz": 43.221,
+        "q": 11.237,
+        "coherence": 0.997,
+        "gain_db": 17.399
+      },
+      {
+        "f_hz": 1053.26,
+        "bw_3db_hz": 42.024,
+        "q": 25.063,
+        "coherence": 0.9948,
+        "gain_db": 20.221
+      },
+      {
+        "f_hz": 1737.907,
+        "bw_3db_hz": 59.288,
+        "q": 29.313,
+        "coherence": 0.9972,
+        "gain_db": 18.52
+      },
+      {
+        "f_hz": 2425.966,
+        "bw_3db_hz": 80.313,
+        "q": 30.206,
+        "coherence": 0.9981,
+        "gain_db": 18.654
+      },
+      {
+        "f_hz": 3011.514,
+        "bw_3db_hz": 98.279,
+        "q": 30.642,
+        "coherence": 0.9987,
+        "gain_db": 19.296
+      },
+      {
+        "f_hz": 3511.734,
+        "bw_3db_hz": 94.254,
+        "q": 37.258,
+        "coherence": 0.9986,
+        "gain_db": 18.167
+      }
+    ],
+    "lpc": {
+      "f_hz": [
+        589.47,
+        2479.84,
+        2835.98
+      ],
+      "bw_hz": [
+        434.39,
+        391.42,
+        393.64
+      ],
+      "order": 10,
+      "fs_lpc": 8000,
+      "pre_emphasis": 0.5,
+      "reliability": "low",
+      "reliability_reasons": [
+        "low_f0_dense_harmonics_le_75hz"
+      ],
+      "harmonic_lock_fractions": [
+        0.1911,
+        0.1955,
+        0.1126
+      ],
+      "voiced_frames": 246
+    }
+  },
+  "band_energy_fractions": {
+    "filtered": {
+      "0-100": 0.38439431723562234,
+      "100-300": 0.10349790763037338,
+      "300-420": 0.04451043987200869,
+      "420-800": 0.287685750463797,
+      "800-1500": 0.05019204334221119,
+      "1500-3000": 0.05877766660516635,
+      "3000-22050": 0.07094187485082111
+    },
+    "source": {
+      "0-100": 0.7431545559012877,
+      "100-300": 0.22904874757506521,
+      "300-420": 0.009374671282380509,
+      "420-800": 0.011280561981006949,
+      "800-1500": 0.00279707041623654,
+      "1500-3000": 0.0020625864719396657,
+      "3000-22050": 0.00228180637208345
+    }
+  },
+  "harmonic_band_fractions": {
+    "filtered": {
+      "f0_pm_8": 0.38400483236008376,
+      "2f0_pm_8": 0.0362535406452025
+    },
+    "source": {
+      "f0_pm_8": 0.7427270670455067,
+      "2f0_pm_8": 0.10205689141649776
+    }
+  },
+  "shaping_at_measured_f1": {
+    "f1_hz": 485.68,
+    "shaping_gain_db": 17.956,
+    "filtered_band_fraction": 0.245663,
+    "source_band_fraction": 0.003933,
+    "shaping_gain_db_F1_b3db": 20.116,
+    "b3db": {
+      "shaping_gain_db_F1_b3db": 20.116,
+      "band_hz": [
+        464.07,
+        507.291
+      ],
+      "f1_band_energy_fraction_measured_b3db": 0.209509,
+      "source_band_energy_fraction_measured_b3db": 0.00204,
+      "min_half_width_hz": 5.3833
+    },
+    "pm60": {
+      "shaping_gain_db_F1_pm60": 17.956,
+      "band_hz": [
+        425.68,
+        545.68
+      ],
+      "f1_band_energy_fraction_measured_pm60": 0.245663,
+      "source_band_energy_fraction_measured_pm60": 0.003933
+    }
+  },
+  "source_spectral_tilt_db_per_oct": -12.052,
+  "audio": {
+    "source_peak_dbfs": -1.0,
+    "filtered_peak_dbfs": -1.0,
+    "clipping_detected": false
+  }
+}

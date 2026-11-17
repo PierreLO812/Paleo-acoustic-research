@@ -1,0 +1,77 @@
+{
+  "kind": "hypothesis_scenario",
+  "scenario": "median",
+  "wav_file": "scenario_damping_median.wav",
+  "sample_id": 13,
+  "parameters": {
+    "mucosa_thickness_mm": 0.77623,
+    "wall_mass_per_area": 9.771277,
+    "wall_stiffness_per_area": 1356972.272276,
+    "wall_resistance_per_area": 2900.789632,
+    "extra_damping_factor": 2.795959,
+    "f0_prior_hz": 64.32621,
+    "air_temperature_c": 20.0
+  },
+  "predicted_tmm_peaks": [
+    {
+      "f_hz": 443.182,
+      "bw_3db_hz": 37.687,
+      "q": 11.76,
+      "mag_db": 19.06
+    },
+    {
+      "f_hz": 1034.109,
+      "bw_3db_hz": 42.597,
+      "q": 24.277,
+      "mag_db": 20.967
+    },
+    {
+      "f_hz": 1658.08,
+      "bw_3db_hz": 56.802,
+      "q": 29.19,
+      "mag_db": 19.559
+    }
+  ],
+  "measured_f0_hz": 64.3023,
+  "measured_hf_peaks": [
+    {
+      "f_hz": 448.518,
+      "bw_3db_hz": 37.922,
+      "q": 11.827,
+      "coherence": 0.9992,
+      "gain_db": 17.615
+    },
+    {
+      "f_hz": 1044.014,
+      "bw_3db_hz": 44.549,
+      "q": 23.435,
+      "coherence": 0.9946,
+      "gain_db": 19.564
+    },
+    {
+      "f_hz": 1663.933,
+      "bw_3db_hz": 59.261,
+      "q": 28.078,
+      "coherence": 0.997,
+      "gain_db": 18.195
+    },
+    {
+      "f_hz": 2355.606,
+      "bw_3db_hz": 88.324,
+      "q": 26.67,
+      "coherence": 0.9988,
+      "gain_db": 18.161
+    }
+  ],
+  "band_energy_fractions_filtered": {
+    "0-100": 0.308018680567523,
+    "100-300": 0.0944930569027814,
+    "300-420": 0.03845219018421176,
+    "420-800": 0.4303272591191828,
+    "800-1500": 0.06476001380770276,
+    "1500-3000": 0.04525791016655527,
+    "3000-22050": 0.018690889252043357
+  },
+  "audio_peak_dbfs": -1.0,
+  "clipping_detected": false
+}

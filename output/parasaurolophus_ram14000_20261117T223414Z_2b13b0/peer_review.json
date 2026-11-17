@@ -1,0 +1,65 @@
+{
+  "state": "PEER_REVIEW",
+  "terminal_state": "EXPLORATORY",
+  "contract_status": "CONTRACT_OK",
+  "run_id": "parasaurolophus_ram14000_20261117T223414Z_2b13b0",
+  "passed": true,
+  "issues": [],
+  "info_notes": [],
+  "tolerances": {
+    "f1_measured_vs_tmm_max_rel_err": 0.05,
+    "f2_f3_measured_vs_tmm_max_rel_err": 0.08,
+    "kl_vs_tmm_max_q_rel_err": 0.2,
+    "tmm_vs_analytic_info_rel_err": 0.15,
+    "tmm_vs_analytic_fail_rel_err": 0.3,
+    "min_shaping_gain_db": 3.0,
+    "min_f1_band_energy_fraction": 0.02,
+    "provenance_eps": 1e-06,
+    "max_compare_freq_hz": 2000.0
+  },
+  "comparisons": [
+    {
+      "formant": "F1",
+      "measured_hz": 485.68,
+      "measured_source": "transfer_function",
+      "predicted_tmm_hz": 483.241,
+      "rel_err": 0.00505,
+      "tolerance": 0.05,
+      "passed": true
+    },
+    {
+      "formant": "F2",
+      "measured_hz": 1053.26,
+      "measured_source": "transfer_function",
+      "predicted_tmm_hz": 1048.223,
+      "rel_err": 0.00481,
+      "tolerance": 0.08,
+      "passed": true
+    },
+    {
+      "formant": "F3",
+      "measured_hz": 1737.907,
+      "measured_source": "transfer_function",
+      "predicted_tmm_hz": 1716.756,
+      "rel_err": 0.01232,
+      "tolerance": 0.08,
+      "passed": true
+    }
+  ],
+  "shaping_check": {
+    "shaping_gain_db_F1": 18.144,
+    "shaping_gain_db_F1_b3db": 20.111,
+    "shaping_gain_db_F1_pm60": 18.144,
+    "filtered_f1_band_fraction": 0.241036,
+    "f1_band_energy_fraction_measured_pm60": 0.241036,
+    "b3db_band_hz": [
+      461.863,
+      504.618
+    ],
+    "pm60_band_hz": [
+      423.241,
+      543.241
+    ]
+  },
+  "retry_feedback": []
+}

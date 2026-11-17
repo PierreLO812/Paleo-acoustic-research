@@ -1,0 +1,24 @@
+{
+  "state": "HYPOTHESIS",
+  "taxon": "parasaurolophus_ram14000",
+  "run_id": "parasaurolophus_ram14000_20261117T223414Z_2b13b0",
+  "created_at": "2026-11-17T22:34:14.877563+00:00",
+  "metadata_path": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\models\\parasaurolophus_ram14000\\metadata.json",
+  "prompt_path": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T223414Z_2b13b0\\antigravity_prompt.md",
+  "theory": {
+    "L_m": 0.263804,
+    "c_m_s": 343.0,
+    "f_closed_open_hz": [
+      325.0519324953375,
+      975.1557974860124,
+      1625.2596624766873
+    ],
+    "f_open_open_hz": [
+      650.103864990675,
+      1300.20772998135,
+      1950.3115949720247
+    ],
+    "preferred_formula": "f_n = (2n-1) * c / (4L)"
+  },
+  "retry_feedback": null
+}

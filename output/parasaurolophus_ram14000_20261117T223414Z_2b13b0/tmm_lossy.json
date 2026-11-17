@@ -1,0 +1,167 @@
+{
+  "profile_csv": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\airway_features.csv",
+  "air": {
+    "T_c": 28.5,
+    "c": 348.1549,
+    "rho": 1.170188,
+    "mu": 1.8787393862432884e-05,
+    "gamma": 1.4,
+    "Pr": 0.71
+  },
+  "radiation_model": "unflanged",
+  "extra_damping_factor": 2.0,
+  "wall": {
+    "mass_per_area": 10.0,
+    "stiffness_per_area": 1000000.0,
+    "resistance_per_area": 3162.2776601683795
+  },
+  "wall_resonance_closed_hz": 325.499,
+  "n_segments": 98,
+  "max_segment_mm": 3.99,
+  "df_hz": 0.25,
+  "L_m": 0.263804,
+  "L_eff_m": 0.277999,
+  "a_out_m": 0.023145,
+  "peaks": [
+    {
+      "f_hz": 483.241,
+      "bw_3db_hz": 42.755,
+      "q": 11.303,
+      "mag_db": 17.668
+    },
+    {
+      "f_hz": 1048.223,
+      "bw_3db_hz": 42.614,
+      "q": 24.598,
+      "mag_db": 20.527
+    },
+    {
+      "f_hz": 1716.756,
+      "bw_3db_hz": 55.5,
+      "q": 30.933,
+      "mag_db": 18.973
+    },
+    {
+      "f_hz": 2428.187,
+      "bw_3db_hz": 80.31,
+      "q": 30.235,
+      "mag_db": 18.98
+    },
+    {
+      "f_hz": 3001.238,
+      "bw_3db_hz": 100.455,
+      "q": 29.876,
+      "mag_db": 19.431
+    },
+    {
+      "f_hz": 3484.045,
+      "bw_3db_hz": 94.037,
+      "q": 37.05,
+      "mag_db": 18.252
+    }
+  ],
+  "zin_peaks": [
+    {
+      "f_hz": 473.901,
+      "bw_3db_hz": 57.906,
+      "q": 8.184,
+      "mag_db": 134.626
+    },
+    {
+      "f_hz": 1040.004,
+      "bw_3db_hz": 57.129,
+      "q": 18.204,
+      "mag_db": 141.659
+    },
+    {
+      "f_hz": 1706.18,
+      "bw_3db_hz": 72.948,
+      "q": 23.389,
+      "mag_db": 146.23
+    },
+    {
+      "f_hz": 2407.634,
+      "bw_3db_hz": 129.618,
+      "q": 18.575,
+      "mag_db": 147.773
+    },
+    {
+      "f_hz": 2994.271,
+      "bw_3db_hz": 99.105,
+      "q": 30.213,
+      "mag_db": 158.767
+    },
+    {
+      "f_hz": 3485.45,
+      "bw_3db_hz": 87.415,
+      "q": 39.873,
+      "mag_db": 153.44
+    }
+  ],
+  "analytic_closed_open_hz": [
+    329.937,
+    989.811,
+    1649.685,
+    2309.56
+  ],
+  "analytic_closed_open_eff_hz": [
+    313.09,
+    939.27,
+    1565.45,
+    2191.631
+  ],
+  "analytic_open_open_hz": [
+    659.874,
+    1319.748,
+    1979.623,
+    2639.497
+  ],
+  "grid_independence": {
+    "passed": true,
+    "df_coarse_hz": 0.5,
+    "df_fine_hz": 0.25,
+    "max_freq_shift_pct": 2.9e-05,
+    "max_mag_shift_db": 0.0,
+    "comparisons": [
+      {
+        "coarse_hz": 483.241,
+        "fine_hz": 483.241,
+        "df_pct": 0.0,
+        "dmag_db": 0.0
+      },
+      {
+        "coarse_hz": 1048.223,
+        "fine_hz": 1048.223,
+        "df_pct": 0.0,
+        "dmag_db": 0.0
+      },
+      {
+        "coarse_hz": 1716.756,
+        "fine_hz": 1716.756,
+        "df_pct": 0.0,
+        "dmag_db": 0.0
+      },
+      {
+        "coarse_hz": 2428.187,
+        "fine_hz": 2428.187,
+        "df_pct": 0.0,
+        "dmag_db": 0.0
+      },
+      {
+        "coarse_hz": 3001.238,
+        "fine_hz": 3001.238,
+        "df_pct": 0.0,
+        "dmag_db": 0.0
+      },
+      {
+        "coarse_hz": 3484.044,
+        "fine_hz": 3484.045,
+        "df_pct": 3e-05,
+        "dmag_db": 0.0
+      }
+    ]
+  },
+  "warnings": [
+    "ka > 1 inside band of interest (max ka=1.67); switched to Silva et al. (2009) rational fit above ka=1."
+  ]
+}
