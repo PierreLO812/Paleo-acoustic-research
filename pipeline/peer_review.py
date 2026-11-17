@@ -9,6 +9,7 @@ import numpy as np
 
 from pipeline.measure import (
     compute_shaping_gain_db,
+    compute_shaping_metrics,
     measure_run_dir,
     read_wav_float,
 )
@@ -19,6 +20,7 @@ from pipeline.tmm_lossy import run_tmm_profile
 REVIEW_CONFIG = {
     "f1_measured_vs_tmm_max_rel_err": 0.05,
     "f2_f3_measured_vs_tmm_max_rel_err": 0.08,
+    "kl_vs_tmm_max_q_rel_err": 0.20,
     "tmm_vs_analytic_info_rel_err": 0.15,
     "tmm_vs_analytic_fail_rel_err": 0.30,
     "min_shaping_gain_db": 3.0,
@@ -106,11 +108,52 @@ def _check_provenance(metrics: dict, issues: list[str], feedback: list[dict]) ->
                     )
 
 
+def _check_kl_q_errors(
+    metrics: dict,
+    issues: list[str],
+    info_notes: list[str],
+    feedback: list[dict],
+) -> None:
+    kl_block = metrics.get("kl_vs_tmm") or {}
+    q_errs = kl_block.get("q_rel_err") or []
+    loss_model = kl_block.get("loss_model", "legacy")
+    tol = REVIEW_CONFIG["kl_vs_tmm_max_q_rel_err"]
+    for idx, q_err in enumerate(q_errs[:3]):
+        val = float(q_err)
+        if val > tol:
+            if loss_model == "legacy":
+                info_notes.append(
+                    f"KL(legacy) F{idx + 1} Q deviates {val * 100:.1f}% > {tol * 100:.0f}% from TMM (expected in legacy mode)."
+                )
+            else:
+                msg = (
+                    f"KL vs TMM F{idx + 1} Q relative error {val * 100:.1f}% exceeds {tol * 100:.0f}% "
+                    f"(loss_model={loss_model})"
+                )
+                issues.append(msg)
+                feedback.append(
+                    {
+                        "issue": msg,
+                        "observed": round(val, 4),
+                        "expected": f"<= {tol}",
+                        "suggested_action": "Verify Kirchhoff biquad loss fit and radiation reflection filter in source_tract.py",
+                    }
+                )
+
+
 def review_metrics_only(metrics: dict) -> dict:
     """Evaluate a standalone metrics.json dictionary (e.g. fixture test without WAVs)."""
+    if metrics.get("synthetic") is True:
+        raise ValueError("Refusing to peer-review a synthetic what-if metrics payload (synthetic=true).")
     issues: list[str] = []
+    info_notes: list[str] = []
     feedback: list[dict] = []
     _check_provenance(metrics, issues, feedback)
+    _check_kl_q_errors(metrics, issues, info_notes, feedback)
+    if metrics.get("synth_mode") == "tmm_fir" or metrics.get("independent_of_tmm") is False:
+        issues.append(
+            "synth_mode='tmm_fir' uses the TMM transfer function itself (independent_of_tmm=false); refusing circular validation."
+        )
 
     if metrics.get("clipping_detected") or (metrics.get("audio") or {}).get("clipping_detected"):
         issues.append("clipping_detected is true")
@@ -126,7 +169,9 @@ def review_metrics_only(metrics: dict) -> dict:
             }
         )
     else:
-        sg = metrics.get("shaping_gain_db_F1")
+        sh_block = metrics.get("shaping") or {}
+        sg_b3db = sh_block.get("shaping_gain_db_F1_b3db")
+        sg = sg_b3db if sg_b3db is not None else metrics.get("shaping_gain_db_F1")
         if sg is None or float(sg) < REVIEW_CONFIG["min_shaping_gain_db"]:
             issues.append("cavity filter does not shape the spectrum")
             feedback.append(
@@ -136,6 +181,12 @@ def review_metrics_only(metrics: dict) -> dict:
                     "expected": f">= {REVIEW_CONFIG['min_shaping_gain_db']} dB",
                     "suggested_action": "increase source spectral richness (M4)",
                 }
+            )
+        e_pm60 = sh_block.get("f1_band_energy_fraction_measured_pm60")
+        if e_pm60 is not None and float(e_pm60) < REVIEW_CONFIG["min_f1_band_energy_fraction"]:
+            issues.append(
+                f"F1 band energy fraction in filtered.wav too low "
+                f"({float(e_pm60) * 100:.3f}% < {REVIEW_CONFIG['min_f1_band_energy_fraction'] * 100:.1f}%)"
             )
 
     passed = len(issues) == 0
@@ -152,14 +203,29 @@ def review_metrics_only(metrics: dict) -> dict:
 
 
 def review_run(run_id_or_dir: str | Path, *, profile_csv: Path | None = None) -> dict:
-    """Run independent 3-way physics peer review on a run directory."""
+    """Run independent 3-way physics peer review on a run directory (or fail if synthetic metrics file)."""
     run_path = Path(run_id_or_dir)
-    run_dir = run_path if run_path.exists() else (OUTPUT / str(run_id_or_dir))
+    if run_path.is_file():
+        synth_data = _load_json(run_path)
+        if synth_data.get("synthetic") is True:
+            raise ValueError(f"Refusing to peer-review synthetic metrics file '{run_path}' (synthetic=true).")
+        run_dir = run_path.parent
+    else:
+        run_dir = run_path if run_path.exists() else (OUTPUT / str(run_id_or_dir))
     run_id = run_dir.name
 
     issues: list[str] = []
     info_notes: list[str] = []
     feedback: list[dict] = []
+
+    if run_dir.exists() and not (run_dir / "metrics.json").exists():
+        for cand in sorted(run_dir.glob("SYNTHETIC_*_metrics.json")):
+            if _load_json(cand).get("synthetic") is True:
+                raise ValueError(f"Refusing to peer-review synthetic directory '{run_dir}' ({cand.name}).")
+
+    metrics = _load_json(run_dir / "metrics.json") if (run_dir / "metrics.json").exists() else {}
+    if metrics.get("synthetic") is True:
+        raise ValueError(f"Refusing to peer-review synthetic metrics in '{run_dir}' (synthetic=true).")
 
     missing = [name for name in REQUIRED if not (run_dir / name).exists()]
     if missing:
@@ -173,9 +239,20 @@ def review_run(run_id_or_dir: str | Path, *, profile_csv: Path | None = None) ->
             }
         )
 
-    metrics = _load_json(run_dir / "metrics.json") if (run_dir / "metrics.json").exists() else {}
     if metrics:
         _check_provenance(metrics, issues, feedback)
+        _check_kl_q_errors(metrics, issues, info_notes, feedback)
+        if metrics.get("synth_mode") == "tmm_fir" or metrics.get("independent_of_tmm") is False:
+            msg = "synth_mode='tmm_fir' uses the TMM transfer function itself (independent_of_tmm=false); refusing circular measured-vs-TMM validation."
+            issues.append(msg)
+            feedback.append(
+                {
+                    "issue": msg,
+                    "observed": metrics.get("synth_mode"),
+                    "expected": "independent time-domain waveguide synthesis ('kl')",
+                    "suggested_action": "Use --synth kl (3-port wall junction) instead of --synth tmm_fir for reviewable runs.",
+                }
+            )
         if metrics.get("clipping_detected") or (metrics.get("audio") or {}).get("clipping_detected"):
             issues.append("metrics reports clipping_detected=true")
 
@@ -185,7 +262,7 @@ def review_run(run_id_or_dir: str | Path, *, profile_csv: Path | None = None) ->
 
     # Measure WAVs independently if source.wav & filtered.wav exist
     measured: dict | None = None
-    if (run_dir / "measured.json").exists() and metrics.get("schema_version") == "2.0":
+    if (run_dir / "measured.json").exists() and metrics.get("schema_version") in ("2.0", "2.1"):
         measured = _load_json(run_dir / "measured.json")
     elif (run_dir / "source.wav").exists() and (run_dir / "filtered.wav").exists():
         measured = measure_run_dir(run_dir, write_outputs=False)
@@ -202,6 +279,7 @@ def review_run(run_id_or_dir: str | Path, *, profile_csv: Path | None = None) ->
             tmm_summary = run_tmm_profile(csv_fallback, run_dir, write_outputs=False)["summary"]
 
     comparisons: list[dict] = []
+    sh_metrics: dict | None = None
     shaping_gain_db = None
     f1_band_frac = None
 
@@ -261,20 +339,27 @@ def review_run(run_id_or_dir: str | Path, *, profile_csv: Path | None = None) ->
                         }
                     )
 
-            # TMM vs analytic check (closed-open with end correction L_eff)
+            # TMM vs analytic check (closed-open with end correction L_eff, coupled with wall mass if active)
             analytic_block = metrics.get("analytic") or metrics.get("theoretical") or {}
             analytic_eff = tmm_summary.get("analytic_closed_open_eff_hz") or analytic_block.get("closed_open_hz") or []
             if analytic_eff:
                 f1_tmm = float(tmm_peaks[0]["f_hz"])
-                f1_ana = float(analytic_eff[0])
+                f1_ana_rigid = float(analytic_eff[0])
+                fw_closed = tmm_summary.get("wall_resonance_closed_hz")
+                if fw_closed is not None and float(fw_closed) > 0.0:
+                    f1_ana = float(np.sqrt(f1_ana_rigid**2 + float(fw_closed) ** 2))
+                    ana_label = f"coupled wall-air analytic sqrt((c/4L_eff)^2 + f_w^2) ({f1_ana:.1f} Hz)"
+                else:
+                    f1_ana = f1_ana_rigid
+                    ana_label = f"analytic ({f1_ana:.1f} Hz)"
                 ana_err = abs(f1_tmm - f1_ana) / max(f1_ana, 1e-9)
                 if ana_err > REVIEW_CONFIG["tmm_vs_analytic_fail_rel_err"]:
                     issues.append(
-                        f"TMM F1 ({f1_tmm:.1f} Hz) deviates {ana_err * 100:.1f}% > 30% from analytic ({f1_ana:.1f} Hz)"
+                        f"TMM F1 ({f1_tmm:.1f} Hz) deviates {ana_err * 100:.1f}% > 30% from {ana_label}"
                     )
                 elif ana_err > REVIEW_CONFIG["tmm_vs_analytic_info_rel_err"]:
                     info_notes.append(
-                        f"TMM F1 ({f1_tmm:.1f} Hz) differs {ana_err * 100:.1f}% from uniform c/4L_eff ({f1_ana:.1f} Hz) "
+                        f"TMM F1 ({f1_tmm:.1f} Hz) differs {ana_err * 100:.1f}% from {ana_label} "
                         "due to cross-sectional area flaring."
                     )
 
@@ -283,13 +368,13 @@ def review_run(run_id_or_dir: str | Path, *, profile_csv: Path | None = None) ->
             _, src_x, _ = read_wav_float(run_dir / "source.wav")
             sr_f, flt_x, _ = read_wav_float(run_dir / "filtered.wav")
             f1_tmm = float(tmm_peaks[0]["f_hz"])
-            bw1 = max(float(tmm_peaks[0].get("bw_3db_hz", 70.0)), 120.0)
-            shaping_gain_db, f1_band_frac, src_band_frac = compute_shaping_gain_db(
-                src_x, flt_x, sr_f, f1_tmm, bw1
-            )
+            b1_tmm = float(tmm_peaks[0].get("bw_3db_hz", 70.0))
+            sh_metrics = compute_shaping_metrics(src_x, flt_x, sr_f, f1_tmm, b1_tmm)
+            shaping_gain_db = float(sh_metrics["shaping_gain_db_F1_b3db"])
+            f1_band_frac = float(sh_metrics["f1_band_energy_fraction_measured_pm60"])
             if shaping_gain_db < REVIEW_CONFIG["min_shaping_gain_db"]:
                 msg = "cavity filter does not shape the spectrum"
-                issues.append(f"{msg} (shaping_gain_db={shaping_gain_db:.2f} dB < {REVIEW_CONFIG['min_shaping_gain_db']} dB)")
+                issues.append(f"{msg} (shaping_gain_db_F1_b3db={shaping_gain_db:.2f} dB < {REVIEW_CONFIG['min_shaping_gain_db']} dB)")
                 feedback.append(
                     {
                         "issue": msg,
@@ -328,8 +413,13 @@ def review_run(run_id_or_dir: str | Path, *, profile_csv: Path | None = None) ->
         "tolerances": dict(REVIEW_CONFIG),
         "comparisons": comparisons,
         "shaping_check": {
-            "shaping_gain_db_F1": None if shaping_gain_db is None else round(shaping_gain_db, 3),
+            "shaping_gain_db_F1": None if sh_metrics is None else sh_metrics["shaping_gain_db_F1_pm60"],
+            "shaping_gain_db_F1_b3db": None if sh_metrics is None else sh_metrics["shaping_gain_db_F1_b3db"],
+            "shaping_gain_db_F1_pm60": None if sh_metrics is None else sh_metrics["shaping_gain_db_F1_pm60"],
             "filtered_f1_band_fraction": None if f1_band_frac is None else round(f1_band_frac, 6),
+            "f1_band_energy_fraction_measured_pm60": None if f1_band_frac is None else round(f1_band_frac, 6),
+            "b3db_band_hz": None if sh_metrics is None else sh_metrics["b3db"]["band_hz"],
+            "pm60_band_hz": None if sh_metrics is None else sh_metrics["pm60"]["band_hz"],
         },
         "retry_feedback": feedback,
     }
