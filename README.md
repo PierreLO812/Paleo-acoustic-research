@@ -6,6 +6,8 @@ Projet de recherche en **paléo-acoustique computationnelle** visant à reconstr
 
 ## Architecture du Pipeline
 
+### Solveurs scientifiques (existants)
+
 ```text
 1. Acquisition 3D (Sketchfab API)          ──► scrapping.py
 2. Extraction géométrique (Voxel + 3D Skel) ──► dataset.py / data-analysis.ipynb
@@ -15,6 +17,49 @@ Projet de recherche en **paléo-acoustique computationnelle** visant à reconstr
                                                 longrigorouscall.py, convolution_organique.py,
                                                 gerative_odular.py, modularity_of_the_sound.py
 ```
+
+### Orchestration multi-agents (Grokbot Paleo × Antigravity)
+
+```text
+État 1 HYPOTHESIS
+  Grokbot lit models/<espece>/metadata.json
+  → prompt d'ingénierie pour Antigravity (output/<run_id>/antigravity_prompt.md)
+
+État 2 BUILD_AND_SIM
+  Antigravity écrit/exécute le Python (trimesh / TMM / glotte ; Gmsh si besoin)
+  → output/<run_id>/{source.wav, filtered.wav, metrics.json, spectrogram.png}
+
+État 3 PEER_REVIEW
+  Grokbot « Relecteur Critique » audite metrics + spectrogramme
+  → cohérence f=c/4L ou c/2L, clipping, artefacts numériques
+
+RETRY_LOOP
+  Si échec → feedback à Antigravity (max 3 itérations)
+```
+
+Taxon seed : `models/parasaurolophus_ram14000/metadata.json`
+
+```powershell
+# Tests unitaires (M1–M7, < 15 s)
+python -m pytest -q tests
+
+# Mesures audio indépendantes (M1)
+python -m pipeline.measure --run-dir output\parasaurolophus_ram14000_20261115T105317Z_eacbdf
+
+# Solveur TMM Kirchhoff avec pertes (M2)
+python -m pipeline.tmm_lossy --profile airway_features.csv --fmax 4000 --out output\tmm_check
+
+# Synthèse couplée Kelly–Lochbaum + 2 masses (M4) et review non-circulaire (M3)
+python -m pipeline.build_and_sim --taxon parasaurolophus_ram14000 --synth kl
+python -m pipeline.build_and_sim --taxon parasaurolophus_ram14000 --synth legacy_iir
+
+# Smoke orchestrateur local / mode agents
+python -m pipeline.orchestrator --taxon parasaurolophus_ram14000 --mode local
+python -m pipeline.orchestrator --taxon parasaurolophus_ram14000 --mode agents
+python -m pipeline.orchestrator --taxon parasaurolophus_ram14000 --run-id <RUN_ID> --resume-review
+```
+
+Briefs agents : `prompts/grokbot_hypothesis.md`, `prompts/antigravity_build_sim.md`, `prompts/grokbot_peer_review.md`, `prompts/t3_agent_cycle.md`.
 
 ---
 

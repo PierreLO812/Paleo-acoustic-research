@@ -1,5 +1,11 @@
-# Fichiers audio générés
-*.wav
+# Fichiers audio générés (racine / legacy)
+/*.wav
+
+# Pipeline outputs (regenerable, except one tracked example run)
+output/*
+!output/parasaurolophus_ram14000_20261117T104254Z_19c2be/
+!output/parasaurolophus_ram14000_20261117T104254Z_19c2be/**
+pipeline/.runs/
 
 # Archives Sketchfab et doublons extraits (on conserve uniquement le STL de base)
 *.zip
@@ -16,4 +22,3 @@ venv/
 # Système
 .DS_Store
 Thumbs.db
-

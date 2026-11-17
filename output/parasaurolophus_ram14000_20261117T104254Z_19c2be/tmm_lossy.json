@@ -1,0 +1,160 @@
+{
+  "profile_csv": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\airway_features.csv",
+  "air": {
+    "T_c": 20.0,
+    "c": 343.0,
+    "rho": 1.204,
+    "mu": 1.81e-05,
+    "gamma": 1.4,
+    "Pr": 0.71
+  },
+  "radiation_model": "unflanged",
+  "n_segments": 98,
+  "max_segment_mm": 3.99,
+  "df_hz": 0.25,
+  "L_m": 0.263804,
+  "L_eff_m": 0.282343,
+  "a_out_m": 0.030229,
+  "peaks": [
+    {
+      "f_hz": 341.692,
+      "bw_3db_hz": 7.585,
+      "q": 45.048,
+      "mag_db": 35.377
+    },
+    {
+      "f_hz": 1008.243,
+      "bw_3db_hz": 20.044,
+      "q": 50.3,
+      "mag_db": 27.997
+    },
+    {
+      "f_hz": 1636.556,
+      "bw_3db_hz": 30.065,
+      "q": 54.434,
+      "mag_db": 25.401
+    },
+    {
+      "f_hz": 2335.196,
+      "bw_3db_hz": 51.326,
+      "q": 45.497,
+      "mag_db": 23.914
+    },
+    {
+      "f_hz": 2785.157,
+      "bw_3db_hz": 43.782,
+      "q": 63.614,
+      "mag_db": 25.366
+    },
+    {
+      "f_hz": 3423.31,
+      "bw_3db_hz": 56.289,
+      "q": 60.817,
+      "mag_db": 18.639
+    }
+  ],
+  "zin_peaks": [
+    {
+      "f_hz": 341.573,
+      "bw_3db_hz": 7.592,
+      "q": 44.993,
+      "mag_db": 143.835
+    },
+    {
+      "f_hz": 1007.246,
+      "bw_3db_hz": 20.336,
+      "q": 49.531,
+      "mag_db": 142.864
+    },
+    {
+      "f_hz": 1634.901,
+      "bw_3db_hz": 30.569,
+      "q": 53.483,
+      "mag_db": 145.238
+    },
+    {
+      "f_hz": 2330.983,
+      "bw_3db_hz": 52.002,
+      "q": 44.825,
+      "mag_db": 146.77
+    },
+    {
+      "f_hz": 2785.461,
+      "bw_3db_hz": 43.324,
+      "q": 64.294,
+      "mag_db": 153.806
+    },
+    {
+      "f_hz": 3424.19,
+      "bw_3db_hz": 54.617,
+      "q": 62.694,
+      "mag_db": 141.037
+    }
+  ],
+  "analytic_closed_open_hz": [
+    325.052,
+    975.156,
+    1625.26,
+    2275.364
+  ],
+  "analytic_closed_open_eff_hz": [
+    303.708,
+    911.125,
+    1518.541,
+    2125.958
+  ],
+  "analytic_open_open_hz": [
+    650.104,
+    1300.208,
+    1950.312,
+    2600.415
+  ],
+  "grid_independence": {
+    "passed": true,
+    "df_coarse_hz": 0.5,
+    "df_fine_hz": 0.25,
+    "max_freq_shift_pct": 0.000293,
+    "max_mag_shift_db": 0.0,
+    "comparisons": [
+      {
+        "coarse_hz": 341.691,
+        "fine_hz": 341.692,
+        "df_pct": 0.00029,
+        "dmag_db": 0.0
+      },
+      {
+        "coarse_hz": 1008.243,
+        "fine_hz": 1008.243,
+        "df_pct": 0.0,
+        "dmag_db": 0.0
+      },
+      {
+        "coarse_hz": 1636.556,
+        "fine_hz": 1636.556,
+        "df_pct": 0.0,
+        "dmag_db": 0.0
+      },
+      {
+        "coarse_hz": 2335.197,
+        "fine_hz": 2335.196,
+        "df_pct": 4e-05,
+        "dmag_db": 0.0
+      },
+      {
+        "coarse_hz": 2785.156,
+        "fine_hz": 2785.157,
+        "df_pct": 4e-05,
+        "dmag_db": 0.0
+      },
+      {
+        "coarse_hz": 3423.31,
+        "fine_hz": 3423.31,
+        "df_pct": 0.0,
+        "dmag_db": 0.0
+      }
+    ]
+  },
+  "warnings": [
+    "ka > 1 inside band of interest (max ka=2.21); switched to Silva et al. (2009) rational fit above ka=1."
+  ]
+}

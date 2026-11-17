@@ -1,0 +1,64 @@
+{
+  "taxon": "Parasaurolophus sp.",
+  "specimen_id": "RAM14000",
+  "taxon_slug": "parasaurolophus_ram14000",
+  "run_id": "parasaurolophus_ram14000_20261115T105317Z_eacbdf",
+  "sample_rate": 44100,
+  "duration_s": 2.5,
+  "f0_hz": 60.0,
+  "formant_peaks_hz": [
+    359.6,
+    1080.0,
+    2150.0
+  ],
+  "formant_targets_hz": [
+    359.6,
+    1080.0,
+    2150.0
+  ],
+  "measured_spectral_peaks_hz": [
+    64.599609375
+  ],
+  "bandwidths_hz": [
+    32.2998046875
+  ],
+  "q_factors": [
+    2.0
+  ],
+  "clipping_detected": false,
+  "theoretical": {
+    "L_m": 0.263804,
+    "c_m_s": 343.0,
+    "closed_open_hz": [
+      325.0519324953375,
+      975.1557974860124,
+      1625.2596624766873
+    ],
+    "open_open_hz": [
+      650.103864990675,
+      1300.20772998135,
+      1950.3115949720247
+    ],
+    "preferred_formula": "f_n = (2n-1) * c / (4L)"
+  },
+  "artifacts": {
+    "source.wav": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261115T105317Z_eacbdf\\source.wav",
+    "filtered.wav": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261115T105317Z_eacbdf\\filtered.wav",
+    "spectrogram.png": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261115T105317Z_eacbdf\\spectrogram.png"
+  },
+  "solver_notes": "Baseline BUILD_AND_SIM using cavity-filter centers as formant_peaks_hz. Retry feedback can blend peaks toward theoretical (2n-1)c/4L. Antigravity may replace this with TMM/trimesh/gmsh-backed solvers.",
+  "repo_solvers": {
+    "geometry": "dataset.py",
+    "tmm_impedance": "acoustic_reasonnance.py",
+    "glottal_source": "rigorouscall.py",
+    "optional_long_call": "longrigorouscall.py",
+    "mesh_stack": [
+      "trimesh",
+      "skimage.morphology.skeletonize"
+    ],
+    "future_mesh": [
+      "gmsh"
+    ]
+  },
+  "cwd": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique"
+}

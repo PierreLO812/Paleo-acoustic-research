@@ -1,0 +1,8 @@
+command: python -m pipeline.build_and_sim --taxon parasaurolophus_ram14000 --run-id parasaurolophus_ram14000_20261117T104254Z_19c2be --synth kl
+run_id: parasaurolophus_ram14000_20261117T104254Z_19c2be
+duration_wall_s: 25.238
+final_state: EXPLORATORY
+geometry_qc_status: BONE_DERIVED_EXPLORATORY
+python: 3.14.10 (tags/v3.14.10:b703b2c, Oct 25 2026, 18:26:59) [MSC v.1944 64 bit (ARM64)]
+packages: {"numpy": "2.5.4", "scipy": "1.18.1", "matplotlib": "3.11.2", "soundfile": null, "trimesh": null, "jsonschema": "4.26.0", "pytest": "9.2.0", "vmtk": null, "gmsh": null, "dolfinx": null}
+warnings: ["Optional dependency 'soundfile' is not installed.", "Optional dependency 'trimesh' is not installed.", "ka > 1 inside band of interest (max ka=2.21); switched to Silva et al. (2009) rational fit above ka=1."]

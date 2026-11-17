@@ -1,0 +1,253 @@
+{
+  "schema_version": "2.0",
+  "taxon": "Parasaurolophus sp.",
+  "specimen_id": "RAM14000",
+  "taxon_slug": "parasaurolophus_ram14000",
+  "run_id": "parasaurolophus_ram14000_20261117T104254Z_19c2be",
+  "created_at_utc": "2026-11-17T10:44:55.368965+00:00",
+  "git_commit": "79dafcd",
+  "seed": 0,
+  "sample_rate": 44100,
+  "duration_s": 2.5,
+  "synth_mode": "kl",
+  "state": "EXPLORATORY",
+  "f0": {
+    "prior_hz": 60.0,
+    "measured_hz": 60.7601,
+    "measured_std_hz": 0.8054,
+    "method": "yin"
+  },
+  "formant_targets_hz": [
+    359.6,
+    1080.0,
+    2150.0
+  ],
+  "formants_measured": {
+    "transfer_function": [
+      {
+        "f_hz": 342.056,
+        "bw_3db_hz": 11.536,
+        "q": 29.652,
+        "coherence": 0.8244,
+        "gain_db": 28.817
+      },
+      {
+        "f_hz": 1009.56,
+        "bw_3db_hz": 14.06,
+        "q": 71.803,
+        "coherence": 0.9597,
+        "gain_db": 27.918
+      },
+      {
+        "f_hz": 1636.942,
+        "bw_3db_hz": 19.512,
+        "q": 83.892,
+        "coherence": 0.9642,
+        "gain_db": 26.58
+      },
+      {
+        "f_hz": 2321.315,
+        "bw_3db_hz": 26.299,
+        "q": 88.265,
+        "coherence": 0.9915,
+        "gain_db": 26.142
+      },
+      {
+        "f_hz": 2784.201,
+        "bw_3db_hz": 22.639,
+        "q": 122.983,
+        "coherence": 0.9683,
+        "gain_db": 28.487
+      },
+      {
+        "f_hz": 3409.645,
+        "bw_3db_hz": 38.632,
+        "q": 88.259,
+        "coherence": 0.9901,
+        "gain_db": 20.507
+      }
+    ],
+    "lpc": {
+      "f_hz": [
+        212.5,
+        1623.06,
+        2547.14
+      ],
+      "bw_hz": [
+        200.95,
+        301.7,
+        235.42
+      ],
+      "order": 10,
+      "fs_lpc": 8000,
+      "pre_emphasis": 0.5,
+      "reliability": "low",
+      "reliability_reasons": [
+        "low_f0_dense_harmonics_le_75hz"
+      ],
+      "harmonic_lock_fractions": [
+        0.065,
+        0.1796,
+        0.205
+      ],
+      "voiced_frames": 246
+    }
+  },
+  "formants_predicted_tmm": [
+    {
+      "f_hz": 341.692,
+      "bw_3db_hz": 7.585,
+      "q": 45.048
+    },
+    {
+      "f_hz": 1008.243,
+      "bw_3db_hz": 20.044,
+      "q": 50.3
+    },
+    {
+      "f_hz": 1636.556,
+      "bw_3db_hz": 30.065,
+      "q": 54.434
+    },
+    {
+      "f_hz": 2335.196,
+      "bw_3db_hz": 51.326,
+      "q": 45.497
+    }
+  ],
+  "analytic": {
+    "L_m": 0.263804,
+    "L_eff_m": 0.282343,
+    "c_m_s": 343.0,
+    "closed_open_hz": [
+      325.052,
+      975.156,
+      1625.26,
+      2275.364
+    ],
+    "open_open_hz": [
+      650.104,
+      1300.208,
+      1950.312,
+      2600.415
+    ]
+  },
+  "band_energy_fractions": {
+    "filtered": {
+      "0-100": 0.2857395145562264,
+      "100-300": 0.1953796974149545,
+      "300-420": 0.3000875839109292,
+      "420-800": 0.011902270837655066,
+      "800-1500": 0.034777429001787895,
+      "1500-3000": 0.13920811477811956,
+      "3000-22050": 0.032905389500327294
+    },
+    "source": {
+      "0-100": 0.6909514786575452,
+      "100-300": 0.2669801005802918,
+      "300-420": 0.02040637321804139,
+      "420-800": 0.01084044934202799,
+      "800-1500": 0.00403152900274759,
+      "1500-3000": 0.003950026983979049,
+      "3000-22050": 0.0028400422153668494
+    }
+  },
+  "shaping_gain_db_F1": 11.664,
+  "source_spectral_tilt_db_per_oct": -9.539,
+  "kl_vs_tmm_rel_err": [
+    0.002853,
+    0.001617,
+    0.000139
+  ],
+  "geometry_qc": {
+    "status": "BONE_DERIVED_EXPLORATORY",
+    "flags": [
+      "suspiciously wide for a nasal airway (Dh_mean=20.49 mm > 15.0 mm)",
+      "area values compatible with bone/crest cross-sections, not lumen (A_max=2996.3 mm^2 > 1500.0 mm^2)",
+      "profile derived from bone mesh",
+      "looped airway length unverified"
+    ],
+    "L_mm": 263.804,
+    "A_mean_mm2": 1371.199,
+    "A_max_mm2": 2996.319,
+    "A_p95_mm2": 2182.565,
+    "Dh_mean_mm": 20.486,
+    "n_sections": 99,
+    "n_area_jumps": 0,
+    "source_mesh": "paleo_acoustic_data/RightSkeleton_RAM14000_printable2.stl",
+    "extraction_method": "bone_mesh_skeleton_axis_slice",
+    "sidecar": null,
+    "heuristic_thresholds": {
+      "MAX_AIRWAY_DH_MEAN_MM": 15.0,
+      "MAX_AIRWAY_AREA_MM2": 1500.0,
+      "MIN_LOOP_CREST_RATIO": 1.5,
+      "AREA_JUMP_FACTOR": 3.0
+    }
+  },
+  "review": {
+    "passed": true,
+    "issues": [],
+    "tolerances": {
+      "f1_measured_vs_tmm_max_rel_err": 0.05,
+      "f2_f3_measured_vs_tmm_max_rel_err": 0.08,
+      "tmm_vs_analytic_info_rel_err": 0.15,
+      "tmm_vs_analytic_fail_rel_err": 0.3,
+      "min_shaping_gain_db": 3.0,
+      "min_f1_band_energy_fraction": 0.02,
+      "provenance_eps": 1e-06,
+      "max_compare_freq_hz": 2000.0
+    },
+    "retry_feedback": []
+  },
+  "assumptions": {
+    "air": {
+      "T_c": 20.0,
+      "c": 343.0,
+      "rho": 1.204,
+      "mu": 1.81e-05,
+      "gamma": 1.4,
+      "Pr": 0.71
+    },
+    "soft_tissue": {
+      "lining_present": true,
+      "lining_thickness_mm": 2.0,
+      "glottal_source": "two_mass_stochastic",
+      "boundary_condition": "open_nostril_approx_Z0",
+      "temperature_c": 20.0,
+      "speed_of_sound_m_s": 343.0,
+      "confidence": 0.55,
+      "notes": "Soft tissues not preserved; lining thickness and glottal parameters are explicit priors.",
+      "f0_prior_hz": 60.0,
+      "source_model": "interactive_two_mass_glottal_flow_derivative_with_aspiration",
+      "tract_model": "kelly_lochbaum_radiated_pressure"
+    },
+    "radiation_model": "unflanged"
+  },
+  "audio": {
+    "peak_dbfs": -1.0,
+    "source_peak_dbfs": -1.0,
+    "filtered_peak_dbfs": -1.0,
+    "clipping_detected": false
+  },
+  "warnings": [
+    "Optional dependency 'soundfile' is not installed.",
+    "Optional dependency 'trimesh' is not installed.",
+    "ka > 1 inside band of interest (max ka=2.21); switched to Silva et al. (2009) rational fit above ka=1."
+  ],
+  "deprecated": {
+    "formant_peaks_hz": "removed: was a copy of filter targets"
+  },
+  "artifacts": {
+    "source.wav": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\source.wav",
+    "filtered.wav": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\filtered.wav",
+    "spectrogram.png": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\spectrogram.png",
+    "transfer_function.png": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\transfer_function.png",
+    "tmm_lossy.png": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\tmm_lossy.png",
+    "kl_vs_tmm.png": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\kl_vs_tmm.png",
+    "geometry_qc.png": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\geometry_qc.png",
+    "measured.json": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\measured.json",
+    "tmm_lossy.json": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\tmm_lossy.json",
+    "report.md": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\report.md",
+    "build_log.txt": "C:\\Users\\balad\\OneDrive\\Documents\\Pal\u00e9o-acoustique\\paleoacoustique\\output\\parasaurolophus_ram14000_20261117T104254Z_19c2be\\build_log.txt"
+  }
+}
