@@ -20,6 +20,30 @@ from pipeline.geometry_qc import load_area_profile
 
 
 @dataclass(frozen=True)
+class WallModel:
+    """Lumped yielding-wall mechanical impedance Z_w(w) = R_w + j*w*M_w + K_w/(j*w) (Sondhi 1974; Ishizaka et al. 1975)."""
+
+    mass_per_area: float = 0.0
+    stiffness_per_area: float = 0.0
+    resistance_per_area: float = 0.0
+
+    def is_rigid(self) -> bool:
+        return (
+            self.mass_per_area == 0.0
+            and self.stiffness_per_area == 0.0
+            and self.resistance_per_area == 0.0
+        )
+
+    def impedance(self, omega: np.ndarray) -> np.ndarray:
+        """Specific wall impedance Z_w(omega) in Pa*s/m."""
+        return (
+            float(self.resistance_per_area)
+            + 1j * omega * float(self.mass_per_area)
+            + float(self.stiffness_per_area) / (1j * omega)
+        )
+
+
+@dataclass(frozen=True)
 class Air:
     """Thermodynamic and transport properties of air derived from temperature."""
 
@@ -196,8 +220,10 @@ def solve_tmm(
     df: float = 0.5,
     radiation: str = "unflanged",
     losses: bool = True,
+    wall: WallModel | None = None,
+    extra_damping_factor: float = 1.0,
 ) -> dict:
-    """Compute Z_in(f), H(f) = U_out/U_in, and resonance peaks over [fmin, fmax]."""
+    """Compute Z_in(f), H(f) = U_out/U_in (or P_out/U_in if radiation='closed'), and resonance peaks."""
     air = air or Air()
     if df > 0.5:
         raise ValueError(f"Frequency step df={df} Hz exceeds required <= 0.5 Hz.")
@@ -218,11 +244,14 @@ def solve_tmm(
     d_mat = np.ones_like(freqs, dtype=np.complex128)
 
     if losses:
-        wall_factor = np.sqrt(omega * air.mu / (2.0 * air.rho)) * (
+        wall_factor = float(extra_damping_factor) * np.sqrt(omega * air.mu / (2.0 * air.rho)) * (
             1.0 + (air.gamma - 1.0) / np.sqrt(air.Pr)
         )
     else:
         wall_factor = np.zeros_like(omega)
+
+    use_wall = wall is not None and not wall.is_rigid()
+    inv_z_w = (1.0 / wall.impedance(omega)) if use_wall else None
 
     for lj, aj, rj in zip(seg_len, seg_area, seg_rad):
         alpha = wall_factor / (rj * air.c)
@@ -234,26 +263,56 @@ def solve_tmm(
 
         ch = np.cosh(gamma_p * lj)
         sh = np.sinh(gamma_p * lj)
-        na = a_mat * ch + b_mat * (sh / zc)
-        nb = a_mat * (zc * sh) + b_mat * ch
-        nc = c_mat * ch + d_mat * (sh / zc)
-        nd = c_mat * (zc * sh) + d_mat * ch
+
+        if not use_wall:
+            na = a_mat * ch + b_mat * (sh / zc)
+            nb = a_mat * (zc * sh) + b_mat * ch
+            nc = c_mat * ch + d_mat * (sh / zc)
+            nd = c_mat * (zc * sh) + d_mat * ch
+        else:
+            # Lumped wall shunt Y_w = P*l / Z_w split as two half-shunts around segment matrix (Sondhi 1974)
+            pj = 2.0 * aj / rj
+            yh = (0.5 * pj * lj) * inv_z_w
+            t12 = zc * sh
+            t11 = ch + yh * t12
+            t21 = (sh / zc) + yh * (ch + t11)
+            na = a_mat * t11 + b_mat * t21
+            nb = a_mat * t12 + b_mat * t11
+            nc = c_mat * t11 + d_mat * t21
+            nd = c_mat * t12 + d_mat * t11
         a_mat, b_mat, c_mat, d_mat = na, nb, nc, nd
 
     a_out_m = float(np.sqrt(area_m2[-1] / np.pi))
     zc_out = float(air.rho * air.c / area_m2[-1])
-    z_r, warnings = radiation_impedance(omega, a_out_m, zc_out, air, model=radiation)
 
-    denom = c_mat * z_r + d_mat
-    z_in = (a_mat * z_r + b_mat) / denom
-    h_transfer = 1.0 / denom
+    if radiation == "closed":
+        warnings: list[str] = []
+        z_in = a_mat / np.where(np.abs(c_mat) > 1e-30, c_mat, 1e-30 + 0j)
+        h_transfer = 1.0 / np.where(np.abs(c_mat) > 1e-30, c_mat, 1e-30 + 0j)
+    else:
+        z_r, warnings = radiation_impedance(omega, a_out_m, zc_out, air, model=radiation)
+        denom = c_mat * z_r + d_mat
+        z_in = (a_mat * z_r + b_mat) / denom
+        h_transfer = 1.0 / denom
 
     if not (np.all(np.isfinite(z_in)) and np.all(np.isfinite(h_transfer))):
         raise FloatingPointError("Non-finite values (Inf/NaN) encountered in TMM solution.")
 
     h_mag = np.abs(h_transfer)
     zin_mag = np.abs(z_in)
-    h_peaks = _extract_peaks(freqs, h_mag)
+    h_peaks_all = _extract_peaks(freqs, h_mag)
+    wall_compliance_peaks: list[dict] = []
+    if use_wall and wall is not None and wall.stiffness_per_area > 0.0 and radiation != "closed":
+        h_peaks = []
+        for pk in h_peaks_all:
+            if pk["f_hz"] < 120.0 and pk["mag_db"] < 15.0:
+                wall_compliance_peaks.append(pk)
+            else:
+                h_peaks.append(pk)
+        if not h_peaks:
+            h_peaks = h_peaks_all
+    else:
+        h_peaks = h_peaks_all
     zin_peaks = _extract_peaks(freqs, zin_mag)
 
     l_total_m = float(s_m[-1] - s_m[0])
@@ -265,15 +324,25 @@ def solve_tmm(
         end_corr = 0.0
     l_eff_m = l_total_m + end_corr
 
+    wall_res_hz = None
+    if use_wall and wall is not None and wall.mass_per_area > 0.0:
+        a_bar = float(np.sum(seg_len * seg_area) / np.sum(seg_len))
+        p_bar = float(np.sum(seg_len * (2.0 * seg_area / seg_rad)) / np.sum(seg_len))
+        wall_res_hz = float((1.0 / (2.0 * np.pi)) * np.sqrt(air.rho * (air.c ** 2) * p_bar / (a_bar * wall.mass_per_area)))
+
     return {
         "freqs_hz": freqs,
         "z_in": z_in,
         "h_transfer": h_transfer,
         "h_peaks": h_peaks,
+        "wall_compliance_peaks": wall_compliance_peaks,
         "zin_peaks": zin_peaks,
         "air": asdict(air),
         "radiation_model": radiation,
         "losses_enabled": bool(losses),
+        "extra_damping_factor": float(extra_damping_factor),
+        "wall": asdict(wall) if use_wall and wall is not None else None,
+        "wall_resonance_closed_hz": None if wall_res_hz is None else round(wall_res_hz, 3),
         "n_segments": int(len(seg_len)),
         "max_segment_mm": round(float(np.max(seg_len) * 1e3), 4),
         "df_hz": float(df),
@@ -298,15 +367,37 @@ def check_grid_independence(
     df: float = 0.5,
     radiation: str = "unflanged",
     losses: bool = True,
+    wall: WallModel | None = None,
+    extra_damping_factor: float = 1.0,
     max_freq_shift_pct: float = 0.2,
     max_mag_shift_db: float = 0.5,
 ) -> dict:
     """Solve at df and df/2 and verify peak frequency (<0.2%) and magnitude (<0.5 dB) convergence."""
     coarse = solve_tmm(
-        s_mm, area_mm2, dh_mm, air=air, fmin=fmin, fmax=fmax, df=df, radiation=radiation, losses=losses
+        s_mm,
+        area_mm2,
+        dh_mm,
+        air=air,
+        fmin=fmin,
+        fmax=fmax,
+        df=df,
+        radiation=radiation,
+        losses=losses,
+        wall=wall,
+        extra_damping_factor=extra_damping_factor,
     )
     fine = solve_tmm(
-        s_mm, area_mm2, dh_mm, air=air, fmin=fmin, fmax=fmax, df=df / 2.0, radiation=radiation, losses=losses
+        s_mm,
+        area_mm2,
+        dh_mm,
+        air=air,
+        fmin=fmin,
+        fmax=fmax,
+        df=df / 2.0,
+        radiation=radiation,
+        losses=losses,
+        wall=wall,
+        extra_damping_factor=extra_damping_factor,
     )
 
     p1 = coarse["h_peaks"]
@@ -386,7 +477,7 @@ def plot_tmm_lossy(res: dict, out_png: Path) -> None:
     ax2.legend(loc="upper right", fontsize=8)
 
     fig.tight_layout()
-    fig.savefig(out_png, dpi=140)
+    fig.savefig(out_png, dpi=96)
     plt.close(fig)
 
 
@@ -399,8 +490,11 @@ def run_tmm_profile(
     temperature_c: float = 20.0,
     radiation: str = "unflanged",
     write_outputs: bool = True,
+    prof: dict | None = None,
+    wall: WallModel | None = None,
+    extra_damping_factor: float = 1.0,
 ) -> dict:
-    prof = load_area_profile(profile_csv)
+    prof = prof if prof is not None else load_area_profile(profile_csv)
     air = Air.from_temperature(temperature_c)
     res = check_grid_independence(
         prof["s_mm"],
@@ -412,12 +506,17 @@ def run_tmm_profile(
         df=df,
         radiation=radiation,
         losses=True,
+        wall=wall,
+        extra_damping_factor=extra_damping_factor,
     )
 
     summary = {
         "profile_csv": str(profile_csv),
         "air": res["air"],
         "radiation_model": res["radiation_model"],
+        "extra_damping_factor": res["extra_damping_factor"],
+        "wall": res["wall"],
+        "wall_resonance_closed_hz": res["wall_resonance_closed_hz"],
         "n_segments": res["n_segments"],
         "max_segment_mm": res["max_segment_mm"],
         "df_hz": res["df_hz"],

@@ -9,17 +9,25 @@ from __future__ import annotations
 
 import csv
 import json
+import logging
 from pathlib import Path
 
 import numpy as np
 
+logger = logging.getLogger(__name__)
 
 # Documented heuristic thresholds (never silent facts; emitted into metrics.json)
 MAX_AIRWAY_DH_MEAN_MM = 15.0
 MAX_AIRWAY_AREA_MM2 = 1500.0
 MIN_LOOP_CREST_RATIO = 1.5
 AREA_JUMP_FACTOR = 3.0
+END_SECTION_WINDOW = 3
+END_NEIGHBOUR_COUNT = 5
+END_AREA_JUMP_FACTOR = 2.0
+END_PERIMETER_JUMP_FACTOR = 2.0
 VALID_SIDECAR_ORIGINS = {"CT segmentation", "endocast", "literature"}
+VALID_CENTERLINE_LIMBS = {"ascending", "descending", "other"}
+CENTERLINE_REQUIRED_COLUMNS = ("s_mm", "x_mm", "y_mm", "z_mm", "area_mm2", "perimeter_mm", "limb")
 
 
 class GeometryInputError(FileNotFoundError, ValueError):
@@ -145,6 +153,167 @@ def _find_and_validate_sidecar(profile_csv: Path, sidecar_path: Path | None = No
     return existing, data
 
 
+def _detect_end_section_artifacts(prof: dict) -> list[int]:
+    """Detect indices in the first or last 1..3 sections jumping >2x in both area and perimeter."""
+    area = prof["area_mm2"]
+    n = len(area)
+    if n < END_SECTION_WINDOW + 3:
+        return []
+    perim = prof["perimeter_mm"] if prof.get("perimeter_mm") is not None else (4.0 * area / prof["dh_mm"])
+
+    flagged: list[int] = []
+    # Check start window [0, 1, 2] against the 5 interior neighbours immediately following it
+    start_ref_lo = min(END_SECTION_WINDOW, n - 1)
+    start_ref_hi = min(n, start_ref_lo + END_NEIGHBOUR_COUNT)
+    if start_ref_hi > start_ref_lo:
+        med_a_s = float(np.median(area[start_ref_lo:start_ref_hi]))
+        med_p_s = float(np.median(perim[start_ref_lo:start_ref_hi]))
+        for idx in range(min(END_SECTION_WINDOW, n)):
+            if (
+                area[idx] > END_AREA_JUMP_FACTOR * max(med_a_s, 1e-9)
+                and perim[idx] > END_PERIMETER_JUMP_FACTOR * max(med_p_s, 1e-9)
+            ):
+                flagged.append(idx)
+
+    # Check end window [n-3, n-2, n-1] against the 5 interior neighbours preceding the window
+    end_win_start = max(0, n - END_SECTION_WINDOW)
+    end_ref_lo = max(0, end_win_start - END_NEIGHBOUR_COUNT)
+    end_ref_hi = end_win_start
+    if end_ref_hi > end_ref_lo:
+        med_a_e = float(np.median(area[end_ref_lo:end_ref_hi]))
+        med_p_e = float(np.median(perim[end_ref_lo:end_ref_hi]))
+        for idx in range(end_win_start, n):
+            if idx not in flagged and (
+                area[idx] > END_AREA_JUMP_FACTOR * max(med_a_e, 1e-9)
+                and perim[idx] > END_PERIMETER_JUMP_FACTOR * max(med_p_e, 1e-9)
+            ):
+                flagged.append(idx)
+
+    return sorted(flagged)
+
+
+def _compute_qc_stats(prof: dict) -> tuple[float, float, float, float, float, int]:
+    s_mm = prof["s_mm"]
+    area_mm2 = prof["area_mm2"]
+    dh_mm = prof["dh_mm"]
+    l_mm = float(s_mm[-1] - s_mm[0])
+    a_mean = float(np.mean(area_mm2))
+    a_max = float(np.max(area_mm2))
+    a_p95 = float(np.percentile(area_mm2, 95))
+    dh_mean = float(np.mean(dh_mm))
+
+    n_jumps = 0
+    for i in range(len(area_mm2) - 1):
+        lo = max(0, i - 2)
+        hi = min(len(area_mm2), i + 3)
+        local_med = float(np.median(area_mm2[lo:hi]))
+        if abs(area_mm2[i + 1] - area_mm2[i]) > AREA_JUMP_FACTOR * max(local_med, 1e-6):
+            n_jumps += 1
+    return l_mm, a_mean, a_max, a_p95, dh_mean, n_jumps
+
+
+def apply_end_section_trim(
+    qc: dict,
+    prof: dict,
+    trim_mode: str | int = "0",
+) -> tuple[dict, dict, list[str]]:
+    """Optionally trim flagged/requested outer sections without mutating input dicts; never trims when '0'."""
+    mode_str = str(trim_mode).strip()
+    if mode_str == "0":
+        return qc, prof, []
+
+    n = len(prof["s_mm"])
+    flagged = list((qc.get("end_section") or {}).get("flagged_indices") or [])
+    to_remove: list[int] = []
+
+    if mode_str == "auto":
+        # Remove contiguous flagged sections from the start and/or end
+        i = 0
+        while i in flagged and i < END_SECTION_WINDOW:
+            to_remove.append(i)
+            i += 1
+        j = n - 1
+        while j in flagged and j >= max(0, n - END_SECTION_WINDOW) and j not in to_remove:
+            to_remove.append(j)
+            j -= 1
+    else:
+        try:
+            count = int(mode_str)
+        except ValueError as exc:
+            raise ValueError(f"Invalid --trim-end-sections value '{trim_mode}'. Expected '0', 'auto', or integer N.") from exc
+        if count < 0:
+            raise ValueError(f"--trim-end-sections N must be >= 0 (got {count}).")
+        if count == 0:
+            return qc, prof, []
+        if n - count < 2:
+            raise GeometryInputError(f"Cannot trim {count} end sections from profile of length {n} (<2 left).")
+        start_flagged = [idx for idx in flagged if idx < END_SECTION_WINDOW]
+        end_flagged = [idx for idx in flagged if idx >= n - END_SECTION_WINDOW]
+        if start_flagged and not end_flagged:
+            to_remove = list(range(count))
+        else:
+            to_remove = list(range(n - count, n))
+
+    to_remove = sorted(set(to_remove))
+    if not to_remove:
+        return qc, prof, []
+    if n - len(to_remove) < 2:
+        raise GeometryInputError("Trimming end sections would leave fewer than 2 cross-sections.")
+
+    keep_mask = np.ones(n, dtype=bool)
+    keep_mask[to_remove] = False
+
+    perim_src = (
+        prof["perimeter_mm"]
+        if prof.get("perimeter_mm") is not None
+        else (4.0 * prof["area_mm2"] / prof["dh_mm"])
+    )
+    removed_records = [
+        {
+            "index": int(idx),
+            "s_mm": round(float(prof["s_mm"][idx]), 4),
+            "area_mm2": round(float(prof["area_mm2"][idx]), 3),
+            "perimeter_mm": round(float(perim_src[idx]), 3),
+        }
+        for idx in to_remove
+    ]
+
+    new_prof = dict(prof)
+    new_prof["s_mm"] = prof["s_mm"][keep_mask].copy()
+    new_prof["area_mm2"] = prof["area_mm2"][keep_mask].copy()
+    new_prof["dh_mm"] = prof["dh_mm"][keep_mask].copy()
+    if prof.get("perimeter_mm") is not None:
+        new_prof["perimeter_mm"] = prof["perimeter_mm"][keep_mask].copy()
+
+    l_mm, a_mean, a_max, a_p95, dh_mean, n_jumps = _compute_qc_stats(new_prof)
+    new_qc = dict(qc)
+    new_qc["L_mm"] = round(l_mm, 3)
+    new_qc["A_mean_mm2"] = round(a_mean, 3)
+    new_qc["A_max_mm2"] = round(a_max, 3)
+    new_qc["A_p95_mm2"] = round(a_p95, 3)
+    new_qc["Dh_mean_mm"] = round(dh_mean, 3)
+    new_qc["n_sections"] = int(len(new_prof["s_mm"]))
+    new_qc["n_area_jumps"] = int(n_jumps)
+
+    orig_l = float((qc.get("end_section") or {}).get("original_L_mm", qc["L_mm"]))
+    new_qc["end_section"] = {
+        **(qc.get("end_section") or {}),
+        "trim_mode": mode_str,
+        "trimmed": True,
+        "trimmed_indices": to_remove,
+        "trimmed_sections": removed_records,
+        "original_L_mm": round(orig_l, 3),
+        "trimmed_L_mm": round(l_mm, 3),
+    }
+
+    msg = (
+        f"Trimmed {len(to_remove)} end section(s) (mode={mode_str}): "
+        f"indices={to_remove}, removed={removed_records}, L_mm: {orig_l:.3f} -> {l_mm:.3f} mm."
+    )
+    logger.warning(msg)
+    return new_qc, new_prof, [msg]
+
+
 def evaluate_geometry_qc(
     profile_csv: Path,
     *,
@@ -164,22 +333,8 @@ def evaluate_geometry_qc(
         extraction_method = sidecar_data["origin"]
 
     s_mm = prof["s_mm"]
-    area_mm2 = prof["area_mm2"]
-    dh_mm = prof["dh_mm"]
-
-    l_mm = float(s_mm[-1] - s_mm[0])
-    a_mean = float(np.mean(area_mm2))
-    a_max = float(np.max(area_mm2))
-    a_p95 = float(np.percentile(area_mm2, 95))
-    dh_mean = float(np.mean(dh_mm))
-
-    n_jumps = 0
-    for i in range(len(area_mm2) - 1):
-        lo = max(0, i - 2)
-        hi = min(len(area_mm2), i + 3)
-        local_med = float(np.median(area_mm2[lo:hi]))
-        if abs(area_mm2[i + 1] - area_mm2[i]) > AREA_JUMP_FACTOR * max(local_med, 1e-6):
-            n_jumps += 1
+    l_mm, a_mean, a_max, a_p95, dh_mean, n_jumps = _compute_qc_stats(prof)
+    flagged_end_indices = _detect_end_section_artifacts(prof)
 
     flags: list[str] = []
     if dh_mean > MAX_AIRWAY_DH_MEAN_MM:
@@ -194,6 +349,8 @@ def evaluate_geometry_qc(
     )
     if is_bone_method:
         flags.append("profile derived from bone mesh")
+    if flagged_end_indices:
+        flags.append("end_section_artifact")
 
     if crest_length_mm is not None and crest_length_mm > 0.0:
         if l_mm < MIN_LOOP_CREST_RATIO * crest_length_mm:
@@ -223,11 +380,25 @@ def evaluate_geometry_qc(
         "source_mesh": str(source_mesh),
         "extraction_method": str(extraction_method),
         "sidecar": sidecar_data,
+        "end_section": {
+            "end_section_artifact": bool(flagged_end_indices),
+            "flagged_indices": flagged_end_indices,
+            "trim_mode": "0",
+            "trimmed": False,
+            "trimmed_indices": [],
+            "trimmed_sections": [],
+            "original_L_mm": round(l_mm, 3),
+            "trimmed_L_mm": round(l_mm, 3),
+        },
         "heuristic_thresholds": {
             "MAX_AIRWAY_DH_MEAN_MM": MAX_AIRWAY_DH_MEAN_MM,
             "MAX_AIRWAY_AREA_MM2": MAX_AIRWAY_AREA_MM2,
             "MIN_LOOP_CREST_RATIO": MIN_LOOP_CREST_RATIO,
             "AREA_JUMP_FACTOR": AREA_JUMP_FACTOR,
+            "END_SECTION_WINDOW": END_SECTION_WINDOW,
+            "END_NEIGHBOUR_COUNT": END_NEIGHBOUR_COUNT,
+            "END_AREA_JUMP_FACTOR": END_AREA_JUMP_FACTOR,
+            "END_PERIMETER_JUMP_FACTOR": END_PERIMETER_JUMP_FACTOR,
         },
     }
     return qc, prof
@@ -369,5 +540,97 @@ def plot_geometry_qc(qc: dict, prof: dict, out_png: Path) -> None:
     ax2.legend(loc="upper right", fontsize=8)
 
     fig.tight_layout()
-    fig.savefig(out_png, dpi=140)
+    fig.savefig(out_png, dpi=96)
     plt.close(fig)
+
+
+def load_looped_centerline(
+    csv_path: Path,
+    *,
+    crest_length_mm: float | None = None,
+    sidecar_path: Path | None = None,
+) -> tuple[dict, dict]:
+    """Load and validate a full looped airway centerline CSV + mandatory .source.json sidecar."""
+    csv_path = Path(csv_path)
+    if not csv_path.exists():
+        raise GeometryInputError(
+            f"Missing looped airway centerline CSV: '{csv_path}'. "
+            f"Expected columns: {', '.join(CENTERLINE_REQUIRED_COLUMNS)}."
+        )
+
+    sc_path, sidecar_data = _find_and_validate_sidecar(csv_path, sidecar_path)
+    with csv_path.open("r", encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        if reader.fieldnames is None:
+            raise GeometryInputError(f"Empty looped centerline CSV '{csv_path}'.")
+        fields = [f.strip() for f in reader.fieldnames if f is not None]
+        missing = [c for c in CENTERLINE_REQUIRED_COLUMNS if c not in fields]
+        if missing:
+            raise GeometryInputError(
+                f"Looped centerline '{csv_path}' missing required columns {missing}. "
+                f"Expected: {', '.join(CENTERLINE_REQUIRED_COLUMNS)}."
+            )
+        rows = list(reader)
+
+    if len(rows) < 2:
+        raise GeometryInputError(f"Looped centerline '{csv_path}' must contain at least 2 cross-sections.")
+
+    try:
+        s_mm = np.array([float(r["s_mm"]) for r in rows], dtype=np.float64)
+        x_mm = np.array([float(r["x_mm"]) for r in rows], dtype=np.float64)
+        y_mm = np.array([float(r["y_mm"]) for r in rows], dtype=np.float64)
+        z_mm = np.array([float(r["z_mm"]) for r in rows], dtype=np.float64)
+        area_mm2 = np.array([float(r["area_mm2"]) for r in rows], dtype=np.float64)
+        perimeter_mm = np.array([float(r["perimeter_mm"]) for r in rows], dtype=np.float64)
+    except (TypeError, ValueError) as exc:
+        raise GeometryInputError(f"Non-numeric centerline values in '{csv_path}': {exc}") from exc
+
+    limbs = [(r.get("limb") or "").strip() for r in rows]
+    bad_limbs = sorted({lb for lb in limbs if lb not in VALID_CENTERLINE_LIMBS})
+    if bad_limbs:
+        raise GeometryInputError(
+            f"Invalid limb label(s) {bad_limbs} in '{csv_path}'. Allowed: {sorted(VALID_CENTERLINE_LIMBS)}."
+        )
+
+    if not (
+        np.all(np.isfinite(s_mm))
+        and np.all(np.isfinite(x_mm))
+        and np.all(np.isfinite(y_mm))
+        and np.all(np.isfinite(z_mm))
+        and np.all(np.isfinite(area_mm2))
+        and np.all(np.isfinite(perimeter_mm))
+    ):
+        raise GeometryInputError(f"Non-finite values in looped centerline '{csv_path}'.")
+    if np.any(np.diff(s_mm) <= 0.0):
+        raise GeometryInputError(f"s_mm must be strictly monotonically increasing in '{csv_path}'.")
+    if np.any(area_mm2 <= 0.0) or np.any(perimeter_mm <= 0.0):
+        raise GeometryInputError(f"area_mm2 and perimeter_mm must be > 0 in '{csv_path}'.")
+
+    l_loop_mm = float(s_mm[-1] - s_mm[0])
+    loop_crest_ratio = (
+        round(l_loop_mm / float(crest_length_mm), 4)
+        if crest_length_mm is not None and crest_length_mm > 0.0
+        else None
+    )
+
+    qc, prof = evaluate_geometry_qc(
+        csv_path,
+        source_mesh=sidecar_data.get("reference", str(sc_path)),
+        extraction_method=sidecar_data["origin"],
+        sidecar_path=sc_path,
+        require_sidecar=True,
+        crest_length_mm=crest_length_mm,
+    )
+    prof["x_mm"] = x_mm
+    prof["y_mm"] = y_mm
+    prof["z_mm"] = z_mm
+    prof["limb"] = limbs
+    qc["looped_airway"] = {
+        "status": "verified_centerline",
+        "centerline_csv": str(csv_path),
+        "loop_length_mm": round(l_loop_mm, 3),
+        "crest_length_mm": None if crest_length_mm is None else round(float(crest_length_mm), 3),
+        "loop_to_crest_ratio": loop_crest_ratio,
+        "limb_counts": {k: limbs.count(k) for k in sorted(VALID_CENTERLINE_LIMBS)},
+    }
+    return qc, prof
